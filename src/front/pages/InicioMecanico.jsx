@@ -31,7 +31,7 @@ export const InicioMecanico = () => {
   }, [])
 
   const getEstadoBadge = (estado) => {
-    if (estado === 'En Proceso') {
+    if (estado === 'En proceso') {
       return <span className="badge rounded-pill bg-warning">En Proceso</span>;
     }
     else if (estado == 'Ingresado') {

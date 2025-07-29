@@ -110,6 +110,33 @@ def get_orden_de_trabajo():
     return jsonify({'msg':'ok', 'ordenes_de_trabajo':ot_serialized_by_user})
 
 
+#ENDPOINT PARA MODIFICAR ORDENES DE TRABAJO
+@app.route('/modificar_orden/<int:id_ot>', methods = ['PUT'])
+@jwt_required()
+def modificar_orden(id_ot):
+    email_user_current = get_jwt_identity()
+    user_current = User.query.filter_by(email=email_user_current).first()
+    print(user_current)
+    ot_to_update = Orden_de_trabajo.query.get(id_ot)
+    print("esta es la OT a actualizar")
+    print(ot_to_update)
+
+
+    body = request.get_json()
+    if body is None:
+        return jsonify({'msg': 'No se envio informacion para actualizar' }), 404
+
+    if 'estado_servicio' in body:
+        ot_to_update.estado_servicio = body['estado_servicio']
+    if 'fecha_final' in body:
+        ot_to_update.fecha_final = body['fecha_final']
+    
+    db.session.commit()
+       
+    return jsonify({'msg': 'ok', 'ot': ot_to_update.serialize()}), 200
+    
+
+
 #ENDPOINT PARA REGISTRAR NUEVO USUARIO
 @app.route('/register', methods = ['POST'])
 def register_user():
