@@ -28,7 +28,7 @@ ENV = "development" if os.getenv("FLASK_DEBUG") == "1" else "production"
 static_file_dir = os.path.join(os.path.dirname(
     os.path.realpath(__file__)), '../dist/')
 app = Flask(__name__)
-CORS(app)
+CORS(app, resources={r"/*": {"origins": "*"}}, supports_credentials=True)
 
 app.config["JWT_SECRET_KEY"] = os.getenv('JWT_KEY')
 jwt = JWTManager(app)
@@ -73,6 +73,8 @@ def sitemap():
     return send_from_directory(static_file_dir, 'index.html')
 
 # any other endpoint will try to serve it like a static file
+
+
 @app.route('/<path:path>', methods=['GET'])
 def serve_any_other_file(path):
     if not os.path.isfile(os.path.join(static_file_dir, path)):
@@ -81,29 +83,32 @@ def serve_any_other_file(path):
     response.cache_control.max_age = 0  # avoid cache memory
     return response
 
-#CREACION DE ENDPOINT DEL PROYECTO
+# CREACION DE ENDPOINT DEL PROYECTO
 
-#ENDPOINT PARA TRAER ORDENES DE TRABAJO
-@app.route('/ordenes_de_trabajo', methods = ['GET'])
+# ENDPOINT PARA TRAER ORDENES DE TRABAJO
+
+
+@app.route('/ordenes_de_trabajo', methods=['GET'])
 @jwt_required()
 def get_orden_de_trabajo():
     email_user_current = get_jwt_identity()
     user_current = User.query.filter_by(email=email_user_current).first()
     id_propietario = user_current.id_user
-    ordenes_de_trabajo = Orden_de_trabajo.query.filter_by(usuario_id = id_propietario).all()    
+    ordenes_de_trabajo = Orden_de_trabajo.query.filter_by(
+        usuario_id=id_propietario).all()
     print(ordenes_de_trabajo)
-    
+
     ot_serialized_by_user = []
 
     for orden_de_trabajo in ordenes_de_trabajo:
         ot_serialized_by_user.append(orden_de_trabajo.serialize())
 
     print(ot_serialized_by_user)
-    return jsonify({'msg':'ok', 'ordenes_de_trabajo':ot_serialized_by_user})
+    return jsonify({'msg': 'ok', 'ordenes_de_trabajo': ot_serialized_by_user})
 
 
-#ENDPOINT PARA REGISTRAR NUEVO USUARIO
-@app.route('/register', methods = ['POST'])
+# ENDPOINT PARA REGISTRAR NUEVO USUARIO
+@app.route('/register', methods=['POST'])
 def register_user():
     body = request.get_json(silent=True)
     if body is None:
@@ -118,7 +123,7 @@ def register_user():
         return jsonify({'msg': 'Debes enviar un numero telefonico del usuario'})
     if 'email' not in body:
         return jsonify({'msg': 'Debes enviar el email e usuario'})
-        
+
     new_user = User()
     new_user.nombre = body['nombre']
     new_user.identificacion = body['identificacion']
@@ -128,15 +133,15 @@ def register_user():
     new_user.foto_usuario = body['foto_usuario']
     new_user.is_active = True
     new_user.rol = RolEnum.CLIENTE
-    
+
     db.session.add(new_user)
     db.session.commit()
     return jsonify({'msg': 'ok', 'user': new_user.serialize()})
 
 
-#CREACION DEL ENDPOINT DE LOGIN
+# CREACION DEL ENDPOINT DE LOGIN
 
-@app.route('/login', methods = ['POST'])
+@app.route('/login', methods=['POST'])
 def login():
     body = request.get_json(silent=True)
     if body is None:
@@ -153,17 +158,18 @@ def login():
     if user is None:
         return jsonify({'msg': 'Usuario o contraseña incorrectos 1'}), 400
     if user.password != body['password']:
-        return jsonify({'msg': 'Usuario o contraseña incorrectos 2' }), 400
+        return jsonify({'msg': 'Usuario o contraseña incorrectos 2'}), 400
 
-    access_token = create_access_token(identity=user.email, expires_delta=timedelta(hours=2))  # despues de mail expires_delta=timedelta(hours=2)
+    access_token = create_access_token(identity=user.email, expires_delta=timedelta(
+        hours=2))  # despues de mail expires_delta=timedelta(hours=2)
     return jsonify({'msg': 'ok', 'token': access_token, 'tipo_de_usuario': tipo_de_usuario}), 200
-                                                                                                    
 
-#ENDPOINT PARA CREAR VEHICULOS
 
-@app.route('/crear_vehiculo', methods = ['POST'])
+# ENDPOINT PARA CREAR VEHICULOS
+
+@app.route('/crear_vehiculo', methods=['POST'])
 def crear_vehiculo():
-    body = request.get_json(silent = True)
+    body = request.get_json(silent=True)
     if body is None:
         return jsonify({'msg': 'debes enviar informacion del vehiculo en el body'}), 400
     if 'matricula' not in body:
@@ -188,10 +194,10 @@ def crear_vehiculo():
     db.session.commit()
     return jsonify({'msg': 'ok', 'Vehiculo': new_car.serialize()})
 
-    
-#ENDPOINT PARA TRAER LOS VEHICULOS DE UN USUARIO LOGEADO
 
-@app.route('/mis_vehiculos', methods = ['GET'])
+# ENDPOINT PARA TRAER LOS VEHICULOS DE UN USUARIO LOGEADO
+
+@app.route('/mis_vehiculos', methods=['GET'])
 @jwt_required()
 def mostrar_vehiculos():
     email_user_current = get_jwt_identity()
@@ -199,7 +205,7 @@ def mostrar_vehiculos():
     print(user_current)
     print(user_current.id_user)
     id_propietario = user_current.id_user
-    vehiculos = Vehiculos.query.filter_by(user_id = id_propietario).all()    
+    vehiculos = Vehiculos.query.filter_by(user_id=id_propietario).all()
     print(vehiculos)
 
     vehicles_serialized_by_user = []
@@ -208,10 +214,10 @@ def mostrar_vehiculos():
         vehicles_serialized_by_user.append(vehicle.serialize())
 
     print(vehicles_serialized_by_user)
-    return jsonify({'msg':'ok', 'vehiculos':vehicles_serialized_by_user})
+    return jsonify({'msg': 'ok', 'vehiculos': vehicles_serialized_by_user})
 
 
-#ENDPOINT PARA TRAER TODOS LOS VEHICULOS
+# ENDPOINT PARA TRAER TODOS LOS VEHICULOS
 
 @app.route('/all_vehicles', methods=['GET'])
 def get_all_vehicles():
@@ -222,10 +228,10 @@ def get_all_vehicles():
         vehicles_serialized.append(vehicle.serialize())
 
     print(vehicles_serialized)
-    return jsonify({'msg':'ok', 'vehiculos':vehicles_serialized})
+    return jsonify({'msg': 'ok', 'vehiculos': vehicles_serialized})
 
 
-#ENDPOINT PARA BORRAR VEHICULOS 
+# ENDPOINT PARA BORRAR VEHICULOS
 
 @app.route('/eliminar_vehiculo/<int:id_vehiculo>', methods=['DELETE'])
 @jwt_required()
@@ -235,7 +241,8 @@ def eliminar_vehiculo(id_vehiculo):
     if not user_current:
         return jsonify({'msg': 'Usuario no encontrado'}), 404
     # Buscar el vehículo con ese ID que pertenezca al usuario autenticado
-    vehiculo = Vehiculos.query.filter_by(id_vehiculo=id_vehiculo, user_id=user_current.id_user).first()
+    vehiculo = Vehiculos.query.filter_by(
+        id_vehiculo=id_vehiculo, user_id=user_current.id_user).first()
     if not vehiculo:
         return jsonify({'msg': 'Vehículo no encontrado o no te pertenece'}), 404
 
@@ -244,9 +251,9 @@ def eliminar_vehiculo(id_vehiculo):
     return jsonify({'msg': 'Vehículo eliminado correctamente'}), 200
 
 
-#ENDPOINT PARA CREAR VEHICULOS DE UN USUARIO ESPECIFICO
+# ENDPOINT PARA CREAR VEHICULOS DE UN USUARIO ESPECIFICO
 
-@app.route('/crear_mis_vehiculos', methods = ['POST'])
+@app.route('/crear_mis_vehiculos', methods=['POST'])
 @jwt_required()
 def crear_mis_vehiculos():
     email_user_current = get_jwt_identity()
@@ -257,8 +264,8 @@ def crear_mis_vehiculos():
     new_matricula = user_current
     print("voy a impimir userCurrent")
     print(new_matricula)
-    
-    body = request.get_json(silent = True)
+
+    body = request.get_json(silent=True)
     if body is None:
         return jsonify({'msg': 'debes enviar informacion del vehiculo en el body'}), 400
     if 'matricula' not in body:
@@ -283,10 +290,54 @@ def crear_mis_vehiculos():
     db.session.commit()
     return jsonify({'msg': 'ok', 'Vehiculo': new_car.serialize()})
 
+# ************************************************************************************************registro de vehiculos sin encriptacion
 
-#ENDPOINT PRA EDITAR VEHICULOS
 
-#ENDPOINT PARA EDITAR PERFIL DE USUARIO
+@app.route('/crear_vehiculo_libre', methods=['POST'])
+def crear_vehiculo_libre():
+    body = request.get_json(silent=True)
+
+    # Validaciones básicas
+    if body is None:
+        return jsonify({'msg': 'Debes enviar información del vehículo en el body'}), 400
+    if 'matricula' not in body:
+        return jsonify({'msg': 'Debes enviar la matrícula del vehículo'}), 400
+    if 'marca' not in body:
+        return jsonify({'msg': 'Debes enviar la marca del vehículo'}), 400
+    if 'modelo' not in body:
+        return jsonify({'msg': 'Debes enviar el modelo del vehículo'}), 400
+    if 'year' not in body:
+        return jsonify({'msg': 'Debes enviar el año del vehículo'}), 400
+    if 'user_id' not in body:
+        return jsonify({'msg': 'Debes enviar el Id de un usuario existente'}), 400
+
+    try:
+        # Crear nuevo objeto Vehiculos
+        new_car = Vehiculos()
+        new_car.matricula = body['matricula']
+        new_car.marca = body['marca']
+        new_car.modelo = body['modelo']
+        new_car.year = body['year']
+        # Aquí se asigna el usuario dueño del vehículo
+        new_car.user_id = body['user_id']
+
+        # Guardar en la base de datos
+        db.session.add(new_car)
+        db.session.commit()
+
+        return jsonify({
+            'msg': 'Vehículo registrado sin autenticación',
+            'Vehiculo': new_car.serialize()
+        }), 201
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'msg': 'Error al registrar el vehículo', 'error': str(e)}), 500
+
+
+# ENDPOINT PRA EDITAR VEHICULOS
+
+# ENDPOINT PARA EDITAR PERFIL DE USUARIO
 
 @app.route('/user/<int:user_id>', methods=['PUT'])
 @jwt_required()
@@ -312,9 +363,10 @@ def update_user_profile(user_id):
         if body['email'] != user.email:
             existing_user = User.query.filter_by(email=body['email']).first()
             if existing_user:
-                return jsonify({'msg': 'Este email ya está en uso'}), 409 # Conflicto
+                # Conflicto
+                return jsonify({'msg': 'Este email ya está en uso'}), 409
         user.email = body['email']
-    
+
     # Manejo de foto_usuario:
     if 'foto_usuario' in body:
         user.foto_usuario = body['foto_usuario'] if body['foto_usuario'] else None
@@ -326,7 +378,158 @@ def update_user_profile(user_id):
         db.session.rollback()
         print(f"Error al actualizar perfil de usuario: {e}")
         return jsonify({'msg': 'Error al actualizar el perfil de usuario', 'error': str(e)}), 500
-      
+
+    # Sección de NUEVA ORDEN DE SERVICIO ***************************************************
+
+
+@app.route("/ordenes", methods=["POST"])
+def crear_orden():
+    try:
+        data = request.get_json()
+
+        # Validamos que estén los datos mínimos
+        fecha_ingreso = data.get("fecha_ingreso")
+        estado_servicio = data.get("estado_servicio")
+        usuario_id = data.get("usuario_id")
+        vehiculo_id = data.get("vehiculo_id")
+        mecanico_id = data.get("mecanico_id")
+
+        if not fecha_ingreso or not estado_servicio or not usuario_id or not vehiculo_id or not mecanico_id:
+            return jsonify({"message": "Faltan datos obligatorios"}), 400
+
+        # Convertimos la fecha de string a datetime.date
+        import datetime
+        fecha_ingreso_date = datetime.datetime.strptime(
+            fecha_ingreso, "%Y-%m-%d").date()
+
+        # 🛠 Creamos la orden
+        nueva_orden = Orden_de_trabajo(
+            fecha_ingreso=fecha_ingreso_date,
+            estado_servicio=estado_servicio,  # debe coincidir con el Enum en tu modelo
+            usuario_id=usuario_id,
+            vehiculo_id=vehiculo_id,
+            mecanico_id=mecanico_id,
+            fecha_final=None  # por ahora puede quedar vacía
+        )
+
+        db.session.add(nueva_orden)
+        db.session.commit()
+
+        return jsonify({"message": "Orden de servicio creada con éxito", "orden": nueva_orden.serialize()}), 201
+
+    except Exception as e:
+        print(" Error al crear la orden:", e)
+        return jsonify({"message": "Error al crear la orden", "error": str(e)}), 500
+
+# ***************Busca usuario por identificacion
+
+
+@app.route('/usuarios/<int:identificacion>', methods=['GET'])
+def get_usuario_por_identificacion(identificacion):
+    usuario = User.query.filter_by(identificacion=identificacion).first()
+    if not usuario:
+        return jsonify({"message": "Usuario no encontrado"}), 404
+    return jsonify(usuario.serialize()), 200
+# ****************Lista Vehiculos del Usuario
+
+
+@app.route('/usuarios/<int:user_id>/vehiculos', methods=['GET'])
+def get_vehiculos_usuario(user_id):
+    vehiculos = Vehiculos.query.filter_by(user_id=user_id).all()
+    return jsonify([v.serialize() for v in vehiculos]), 200
+# **********************Lista Los Servicios
+
+
+@app.route('/servicios', methods=['GET'])
+def get_servicios():
+    servicios = Servicio.query.all()
+    return jsonify([s.serialize() for s in servicios]), 200
+
+
+# Este endpoint recibe el JSON desde tu formulario y procesa todo.
+@app.route('/ordenes', methods=['POST'])
+def crear_orden_v2():
+    try:
+        body = request.get_json()
+
+        # 📌 Validar campos obligatorios
+        required_fields = ['fecha_ingreso', 'estado_servicio',
+                           'usuario_id', 'vehiculo_id', 'mecanico_id', 'servicios']
+        for field in required_fields:
+            if field not in body:
+                return jsonify({"message": f"Falta el campo {field}"}), 400
+
+        # 📌 Crear la orden de trabajo
+        nueva_orden = Orden_de_trabajo(
+            fecha_ingreso=body['fecha_ingreso'],
+            estado_servicio=body['estado_servicio'],
+            usuario_id=body['usuario_id'],
+            vehiculo_id=body['vehiculo_id'],
+            mecanico_id=body['mecanico_id']
+        )
+
+        db.session.add(nueva_orden)
+        db.session.commit()  # ✅ para que la orden tenga ID antes de asociar servicios
+
+        # 📌 Asociar servicios seleccionados a la orden
+        servicios_ids = body['servicios']  # esto es una lista de IDs [1,2,3]
+        servicios_asociados = []
+        for servicio_id in servicios_ids:
+            aux = AuxOrdenServicio(
+                orden_id=nueva_orden.id_ot,
+                servicio_id=servicio_id
+            )
+            db.session.add(aux)
+            servicios_asociados.append(aux)
+
+        db.session.commit()
+
+        return jsonify({
+            "message": "✅ Orden creada con éxito",
+            "orden": nueva_orden.serialize()
+        }), 201
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"message": f"❌ Error al crear la orden: {str(e)}"}), 500
+
+# **********************devuelve todas las órdenes con su usuario, vehículo y servicios asociados, usando tus modelos y relaciones:
+
+
+@app.route('/listaOrdenes', methods=['GET'])
+def listar_ordenes():
+    try:
+        ordenes = Orden_de_trabajo.query.all()
+        resultado = []
+
+        for orden in ordenes:
+            orden_serializada = orden.serialize()
+
+            # Agregar datos del usuario (cliente)
+            usuario = orden.cliente
+            orden_serializada['usuario'] = {
+                'id_user': usuario.id_user,
+                'nombre': usuario.nombre,
+                'identificacion': usuario.identificacion,
+                'email': usuario.email
+            } if usuario else None
+
+            # Agregar datos del vehículo
+            vehiculo = orden.vehiculo
+            orden_serializada['vehiculo'] = {
+                'id_vehiculo': vehiculo.id_vehiculo,
+                'matricula': vehiculo.matricula,
+                'marca': vehiculo.marca,
+                'modelo': vehiculo.modelo,
+                'year': vehiculo.year
+            } if vehiculo else None
+
+            resultado.append(orden_serializada)
+
+        return jsonify(resultado), 200
+    except Exception as e:
+        return jsonify({"message": f"Error al listar órdenes: {str(e)}"}), 500
+
 
 # this only runs if `$ python src/main.py` is executed
 if __name__ == '__main__':

@@ -14,6 +14,7 @@ import { Login } from "./pages/Login";
 import { Register } from "./pages/Register";
 import { InicioUser } from "./pages/InicioUser";
 import { InicioMecanico } from "./pages/InicioMecanico";
+import NuevaOrden from "./pages/NuevaOrden";
 
 
 
@@ -38,6 +39,7 @@ export const router = createBrowserRouter(
 
         <Route path="/iniciouser" element={<InicioUser/>} />
         <Route path="/iniciomecanico" element={<InicioMecanico/>} />
+        <Route path="/nueva-orden" element={<NuevaOrden />} />
         
       </Route>
     )

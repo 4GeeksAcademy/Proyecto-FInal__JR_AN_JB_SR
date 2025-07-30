@@ -1,0 +1,170 @@
+import React, { useState, useEffect } from "react";
+
+const NuevaOrden = () => {
+  const [formData, setFormData] = useState({
+    fecha_ingreso: "",
+    estado_servicio: "",
+    usuario_id: "",
+    vehiculo_id: "",
+    mecanico_id: "",
+    servicios: []  // <-- aquí guardaremos los ID de los servicios seleccionados
+  });
+
+  const [identificacion, setIdentificacion] = useState("");
+  const [usuario, setUsuario] = useState(null);
+  const [vehiculos, setVehiculos] = useState([]);
+  const [servicios, setServicios] = useState([]);
+
+  // 🔄 Cargar servicios al montar el componente
+  useEffect(() => {
+    fetch("http://localhost:3001/api/servicios")
+      .then((res) => res.json())
+      .then((data) => setServicios(data))
+      .catch((err) => console.error("❌ Error cargando servicios:", err));
+  }, []);
+
+  // 🔍 Buscar usuario y cargar sus vehículos
+  const buscarUsuario = async () => {
+    try {
+      const response = await fetch(`http://localhost:3001/api/usuarios/${identificacion}`);
+      const data = await response.json();
+
+      if (response.ok) {
+        setUsuario(data);
+        setFormData({ ...formData, usuario_id: data.id_user });
+
+        // Traer vehículos del usuario
+        const vehiculosRes = await fetch(`http://localhost:3001/api/usuarios/${data.id_user}/vehiculos`);
+        const vehiculosData = await vehiculosRes.json();
+        setVehiculos(vehiculosData);
+      } else {
+        alert("❌ Usuario no encontrado");
+        setUsuario(null);
+        setVehiculos([]);
+      }
+    } catch (error) {
+      console.error("❌ Error buscando usuario:", error);
+    }
+  };
+
+  // 🔄 Manejar cambios en campos simples
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  // ✅ Manejar selección múltiple de servicios
+  const handleServiciosChange = (e) => {
+    const opciones = Array.from(e.target.selectedOptions, (option) => option.value);
+    setFormData({ ...formData, servicios: opciones });
+  };
+
+  // 📤 Enviar la orden
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await fetch("http://localhost:3001/api/ordenes", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData)
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        alert("✅ Orden creada con éxito");
+        console.log(data);
+      } else {
+        alert("❌ Error: " + data.message);
+      }
+    } catch (error) {
+      console.error("❌ Error enviando la orden:", error);
+    }
+  };
+
+  return (
+    <div className="container mt-4">
+      <h2>📄 Nueva Orden de Servicio</h2>
+
+      {/* 🔍 Buscar usuario */}
+      <div className="mb-3 d-flex">
+        <input
+          type="text"
+          className="form-control me-2"
+          placeholder="Ingrese identificación del usuario"
+          value={identificacion}
+          onChange={(e) => setIdentificacion(e.target.value)}
+        />
+        <button type="button" className="btn btn-info text-white" onClick={buscarUsuario}>
+          Buscar Usuario
+        </button>
+      </div>
+
+      {/* ✅ Mostrar info del usuario en pantalla */}
+      {usuario && (
+        <div className="alert alert-success">
+          <h5>✅ Datos del Cliente</h5>
+          <p><strong>Nombre:</strong> {usuario.nombre}</p>
+          <p><strong>Email:</strong> {usuario.email}</p>
+          <p><strong>Teléfono:</strong> {usuario.telefono}</p>
+        </div>
+      )}
+
+      {/* 📄 Formulario de orden */}
+      <form onSubmit={handleSubmit}>
+        {/* Fecha */}
+        <div className="mb-3">
+          <label className="form-label">Fecha de Ingreso</label>
+          <input type="date" name="fecha_ingreso" className="form-control" onChange={handleChange} value={formData.fecha_ingreso} />
+        </div>
+
+        {/* Estado */}
+        <div className="mb-3">
+          <label className="form-label">Estado del Servicio</label>
+          <select name="estado_servicio" className="form-control" onChange={handleChange} value={formData.estado_servicio}>
+            <option value="">Seleccione</option>
+            <option value="pendiente">Pendiente</option>
+            <option value="en_proceso">En Proceso</option>
+            <option value="finalizado">Finalizado</option>
+          </select>
+        </div>
+
+        {/* Vehículos del usuario */}
+        <div className="mb-3">
+          <label className="form-label">Vehículo</label>
+          <select name="vehiculo_id" className="form-control" onChange={handleChange} value={formData.vehiculo_id}>
+            <option value="">Seleccione un vehículo</option>
+            {vehiculos.map((v) => (
+              <option key={v.id_vehiculo} value={v.id_vehiculo}>
+                {v.marca} {v.modelo} - {v.matricula}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* Mecánico */}
+        <div className="mb-3">
+          <label className="form-label">ID Mecánico</label>
+          <input type="number" name="mecanico_id" className="form-control" onChange={handleChange} value={formData.mecanico_id} />
+        </div>
+
+        {/* Servicios múltiples */}
+        <div className="mb-3">
+          <label className="form-label">Servicios</label>
+          <select name="servicios" className="form-control" multiple onChange={handleServiciosChange}>
+            {servicios.map((s) => (
+              <option key={s.ide_service} value={s.ide_service}>
+                {s.name_service} - ${s.price}
+              </option>
+            ))}
+          </select>
+          <small className="form-text text-muted">Puedes seleccionar varios servicios (Ctrl+Click)</small>
+        </div>
+
+        <button type="submit" className="btn btn-primary">
+          Crear Orden
+        </button>
+      </form>
+    </div>
+  );
+};
+
+export default NuevaOrden;
