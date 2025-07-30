@@ -1,9 +1,7 @@
 import { useEffect } from "react";
-import { NavbarUser } from "../components/NavbarUser";
 
 
 export const InicioUser = () => {
-
 
 
   function traer_ordenes_de_servicio(){
@@ -82,8 +80,6 @@ export const InicioUser = () => {
 
   return (
     <div>
-      <NavbarUser />
-
       <div className="container mt-4">
         <div className="text-center mb-3">
           <button className="btn btn-info text-white px-4 py-2 fw-bold">Generar Nueva Órden</button>

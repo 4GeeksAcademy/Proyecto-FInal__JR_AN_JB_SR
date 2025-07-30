@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from "react"
 import rigoImageUrl from "../assets/img/rigo-baby.jpg";
 import useGlobalReducer from "../hooks/useGlobalReducer.jsx";
-import { Navbar } from "../components/Navbar"
-import { NavbarMecanico } from "../components/NavbarMecanico.jsx"
 import { VehicleCard } from "../components/VehicleCard.jsx";
 import { matchPath, useNavigate } from "react-router-dom";
 
@@ -90,7 +88,7 @@ export const Vehiculos = () => {
     console.log("estoy creando vehiculos")
     const token = localStorage.getItem("jwt_token")
 
-    fetch(import.meta.env.VITE_BACKEND_URL + "crear_mis_vehiculos", {
+    fetch(import.meta.env.VITE_BACKEND_URL + "/crear_mis_vehiculos", {
       method: "POST",
       body: JSON.stringify(infoNewCar),
       headers: {
@@ -124,8 +122,6 @@ export const Vehiculos = () => {
 
   return (
     <div>
-      <NavbarMecanico />
-
       <div className='container text-center mt-5 mb-3'>
         <div>
           <h1 className="d-inline-block px-5 py-2 border border-primary-subtle rounded-pill text-light" style={{ backgroundColor: '#003366' }}>Mis Vehiculos</h1>

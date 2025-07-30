@@ -12,7 +12,7 @@ export const VehicleCard = (props) => {
   function eliminarVehiculo(id_vehiculo) {
 
     const token = localStorage.getItem("jwt_token")
-    fetch(import.meta.env.VITE_BACKEND_URL + `eliminar_vehiculo/${id_vehiculo}`, {
+    fetch(import.meta.env.VITE_BACKEND_URL + `/eliminar_vehiculo/${id_vehiculo}`, {
       method: "DELETE",
       headers: {
         'Content-Type': 'application/json',

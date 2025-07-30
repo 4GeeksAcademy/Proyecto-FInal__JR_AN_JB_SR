@@ -1,6 +1,6 @@
 import { Link, useNavigate } from "react-router-dom";
 import React, { useState, useEffect } from 'react';
-import "../login.css";
+import "../../login.css";
 
 export const Login = () => {
     const [email, setEmail] = useState('');
@@ -48,7 +48,7 @@ export const Login = () => {
                 console.log('✅ Verificación Exitosa: ¡Inicio de sesión correcto!');
                 console.log('🔑 Token JWT recibido y almacenado:', data.token);
                 console.log(data.tipo_de_usuario)
-                data.tipo_de_usuario == "Cliente" ? navigate('/inicioUser') : navigate('/inicioMecanico') 
+                data.tipo_de_usuario == "Cliente" ? navigate('/dashboard') : navigate('/inicioMecanico') 
             } else {
                 // Si hay un error en la respuesta del backend
                 console.error('❌ Verificación Fallida:', data.msg || 'Credenciales incorrectas.'); // Mensaje de error en consola

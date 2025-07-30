@@ -1,13 +1,12 @@
 import { Link, useNavigate } from "react-router-dom";
 import logoB from "../assets/img/logoB.svg";
 
-export const NavbarUser = () => {
+export const NavbarUser = ({ onSectionChange, activeSection }) => { 
 
   const navigate = useNavigate()
 
     const handleLogout = () => {
     localStorage.removeItem("jwt_token");
-    //setIsLogged(false);
     navigate("/");
     };
 
@@ -31,16 +30,16 @@ export const NavbarUser = () => {
         <div className="collapse navbar-collapse justify-content-end" id="navbarNav">
           <ul className="navbar-nav align-items-center">
             <li className="nav-item">
-              <Link className="nav-link" to="/">Inicio</Link>
+              <a className={`nav-link ${activeSection === 'Inicio' ? 'active-custom' : ''}`} href="#" onClick={() => onSectionChange('Inicio')}>Inicio</a>
             </li>
             <li className="nav-item">
-              <Link className="nav-link" to="/vehiculos">Mis Vehículos</Link>
+              <a className={`nav-link ${activeSection === 'Vehiculos' ? 'active-custom' : ''}`} href="#" onClick={() => onSectionChange('Vehiculos')}>Vehículos</a>
             </li>
             <li className="nav-item">
-              <Link className="nav-link" to="/about">Perfil</Link>
+              <a className={`nav-link ${activeSection === 'Perfil' ? 'active-custom' : ''}`} href="#" onClick={() => onSectionChange('Perfil')}>Perfil</a>
             </li>
             <li className="nav-item">
-              <button onClick={handleLogout} className="btn btn-info ms-3" to="/" >LogOut</button>
+              <button onClick={handleLogout} className="btn btn-info ms-3" >LogOut</button>
             </li>
           </ul>
         </div>

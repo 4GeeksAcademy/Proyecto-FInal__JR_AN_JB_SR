@@ -6,13 +6,13 @@ import {
     Route,
 } from "react-router-dom";
 import { Layout } from "./pages/Layout";
-import { Home } from "./pages/Home";
+import { Home } from "./pages/public_pages/Home";
 import { Single } from "./pages/Single";
 import { Demo } from "./pages/Demo";
 import { Vehiculos } from "./pages/Vehiculos";
-import { Login } from "./pages/Login";
-import { Register } from "./pages/Register";
-import { InicioUser } from "./pages/InicioUser";
+import { Login } from "./pages/public_pages/Login";
+import { Register } from "./pages/public_pages/Register";
+import { UserDashboard } from "./pages/user_dashboard/UserDashboard";
 import { InicioMecanico } from "./pages/InicioMecanico";
 
 
@@ -36,7 +36,7 @@ export const router = createBrowserRouter(
         <Route path="/login" element={<Login/>} />
         <Route path="/register" element={<Register/>} />
 
-        <Route path="/iniciouser" element={<InicioUser/>} />
+        <Route path="/dashboard" element={<UserDashboard/>} />
         <Route path="/iniciomecanico" element={<InicioMecanico/>} />
         
       </Route>
