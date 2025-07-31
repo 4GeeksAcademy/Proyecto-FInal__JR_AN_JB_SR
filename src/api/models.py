@@ -176,7 +176,7 @@ class Servicio(db.Model):
 
     def serialize(self):
         return {
-            'ide_service': self.id_service,
+            'id_service': self.id_service,
             'name_service': self.name_service,
             'price': self.price
         }

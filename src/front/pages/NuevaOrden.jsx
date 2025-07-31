@@ -15,18 +15,18 @@ const NuevaOrden = () => {
   const [vehiculos, setVehiculos] = useState([]);
   const [servicios, setServicios] = useState([]);
 
-  // 🔄 Cargar servicios al montar el componente
+  //  Cargar servicios al montar el componente
   useEffect(() => {
-    fetch("http://localhost:3001/api/servicios")
+    fetch(import.meta.env.VITE_BACKEND_URL + "servicios")
       .then((res) => res.json())
       .then((data) => setServicios(data))
       .catch((err) => console.error("❌ Error cargando servicios:", err));
   }, []);
 
-  // 🔍 Buscar usuario y cargar sus vehículos
+  //  Buscar usuario y cargar sus vehículos
   const buscarUsuario = async () => {
     try {
-      const response = await fetch(`http://localhost:3001/api/usuarios/${identificacion}`);
+      const response = await fetch(import.meta.env.VITE_BACKEND_URL + "usuarios/" + `${identificacion}`);
       const data = await response.json();
 
       if (response.ok) {
@@ -34,7 +34,7 @@ const NuevaOrden = () => {
         setFormData({ ...formData, usuario_id: data.id_user });
 
         // Traer vehículos del usuario
-        const vehiculosRes = await fetch(`http://localhost:3001/api/usuarios/${data.id_user}/vehiculos`);
+        const vehiculosRes = await fetch(import.meta.env.VITE_BACKEND_URL + "usuarios/" + `${data.id_user}/vehiculos`);
         const vehiculosData = await vehiculosRes.json();
         setVehiculos(vehiculosData);
       } else {
@@ -62,7 +62,7 @@ const NuevaOrden = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch("http://localhost:3001/api/ordenes", {
+      const response = await fetch(import.meta.env.VITE_BACKEND_URL + "ordenes", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData)
@@ -108,7 +108,7 @@ const NuevaOrden = () => {
         </div>
       )}
 
-      {/* 📄 Formulario de orden */}
+      {/*  Formulario de orden */}
       <form onSubmit={handleSubmit}>
         {/* Fecha */}
         <div className="mb-3">
@@ -142,8 +142,15 @@ const NuevaOrden = () => {
 
         {/* Mecánico */}
         <div className="mb-3">
-          <label className="form-label">ID Mecánico</label>
-          <input type="number" name="mecanico_id" className="form-control" onChange={handleChange} value={formData.mecanico_id} />
+          <label className="form-label">Mecanicos</label>
+          <select name="Mecanicos" className="form-control" multiple onChange={handleServiciosChange}>
+            {servicios.map((s) => (
+              <option key={s.ide_service} value={s.ide_service}>
+                {s.name_service} - ${s.price}
+              </option>
+            ))}
+          </select>
+          <small className="form-text text-muted">Puedes seleccionar varios servicios (Ctrl+Click)</small>
         </div>
 
         {/* Servicios múltiples */}

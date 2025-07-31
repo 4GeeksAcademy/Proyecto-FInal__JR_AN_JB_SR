@@ -6,7 +6,7 @@ from flask import Flask, request, jsonify, url_for, send_from_directory
 from flask_migrate import Migrate
 from flask_swagger import swagger
 from api.utils import APIException, generate_sitemap
-from api.models import db, User, RolEnum, Vehiculos, Orden_de_trabajo
+from api.models import db, User, RolEnum, Vehiculos, Orden_de_trabajo, Servicio
 
 from datetime import timedelta
 
@@ -430,6 +430,7 @@ def get_usuario_por_identificacion(identificacion):
     if not usuario:
         return jsonify({"message": "Usuario no encontrado"}), 404
     return jsonify(usuario.serialize()), 200
+
 # ****************Lista Vehiculos del Usuario
 
 
