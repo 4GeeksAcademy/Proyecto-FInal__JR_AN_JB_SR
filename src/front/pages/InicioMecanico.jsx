@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 export const InicioMecanico = () => {
 
   const [ordenDeTrabajo, setOrdenDeTrabajo] = useState([])
+  const [fechaTemp, setFechaTemp] = useState()
 
   function traer_ordenes_de_servicio() {
 
@@ -25,6 +26,41 @@ export const InicioMecanico = () => {
       })
       .catch((error) => { error })
   }
+
+
+  function updateInfo(id_ot, fecha_final, estado_servicio) {
+    let newData ={
+      "id_ot": id_ot,
+      "fecha_final": fecha_final,
+      "estado_servicio": estado_servicio
+    }
+    console.log("estos son los nuevos datos")
+    console.log(newData)
+
+    const token = localStorage.getItem("jwt_token")
+    fetch(import.meta.env.VITE_BACKEND_URL + "/modificar_orden/" + id_ot, {
+      method: "PUT",
+      body: JSON.stringify(newData),
+      headers: {
+        "Content-Type": "application/json",
+        "authorization": 'Bearer ' + token
+      }
+    })
+  
+    .then((response)=>{
+      if(!response.ok) throw new Error("Error al modificar la informacion");
+      return response.json()
+    })
+    .then((data)=>{
+      console.log(data.msg)
+      traer_ordenes_de_servicio()
+
+    })
+    .catch((error)=>{error})
+
+  };
+
+
 
   useEffect(() => {
     traer_ordenes_de_servicio()
@@ -75,8 +111,8 @@ export const InicioMecanico = () => {
                   <td>  <input
                     type="date"
                     className="form-control"
-                    value={orden.fecha_final}
-                    onChange={(e) => handleFechaChange(e, orden.id)}
+                    //value={orden.fecha_final}
+                    onChange={(e) => {setFechaTemp(e.target.value)}}
                   /></td>
                   <td>{getEstadoBadge(orden.estado_servicio)}</td>
                   <td>
@@ -85,9 +121,17 @@ export const InicioMecanico = () => {
                         Modificar Estado
                       </button>
                       <ul className="dropdown-menu">
-                        <li><button className="dropdown-item">Ingresado</button></li>
-                        <li><button className="dropdown-item">En proceso</button></li>
-                        <li><button className="dropdown-item">Finalizado</button></li>
+                        <li><button onClick={() => {
+                          updateInfo(orden.id_ot, fechaTemp, "INGRESADO");
+                        }} className="dropdown-item">Ingresado</button></li>
+
+                        <li><button onClick={() => {
+                          updateInfo(orden.id_ot, fechaTemp, "EN_PROCESO");
+                        }} className="dropdown-item">En proceso</button></li>
+
+                        <li><button onClick={() => {
+                          updateInfo(orden.id_ot, fechaTemp, "FINALIZADO");
+                        }} className="dropdown-item">Finalizado</button></li>
                       </ul>
                     </div>
                   </td>
