@@ -8,6 +8,8 @@ from flask_swagger import swagger
 from api.utils import APIException, generate_sitemap
 from api.models import db, User, RolEnum, Vehiculos, Orden_de_trabajo
 
+from twilio.rest import Client
+
 from datetime import timedelta
 
 from api.routes import api
@@ -100,7 +102,7 @@ def get_orden_de_trabajo():
     else:
         ordenes_de_trabajo = Orden_de_trabajo.query.filter_by(mecanico_id = id_propietario).all()    
         print(ordenes_de_trabajo)
-    
+                                                                    
     ot_serialized_by_user = []
 
     for orden_de_trabajo in ordenes_de_trabajo:
@@ -361,7 +363,11 @@ def update_user_profile(user_id):
         db.session.rollback()
         print(f"Error al actualizar perfil de usuario: {e}")
         return jsonify({'msg': 'Error al actualizar el perfil de usuario', 'error': str(e)}), 500
-      
+
+
+#ENDPOINT PARA ENVIAR SMS
+
+
 
 # this only runs if `$ python src/main.py` is executed
 if __name__ == '__main__':

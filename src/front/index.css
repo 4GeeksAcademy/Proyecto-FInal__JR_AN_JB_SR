@@ -50,3 +50,25 @@
     color: #0d6efd;
 }
 
+.calendario-solo-icono {
+  color: transparent; /* Oculta el texto */
+  text-shadow: 0 0 0 gray; /* Para que se vea el texto al seleccionar */
+  position: relative;
+  background-color: white;
+  cursor: pointer;
+}
+
+.calendario-solo-icono::-webkit-calendar-picker-indicator {
+  position: absolute;
+  left: 0;
+  right: 0;
+  margin: auto;
+  width: 100%;
+  cursor: pointer;
+}
+
+.calendario-solo-icono::-webkit-datetime-edit,
+.calendario-solo-icono::-webkit-inner-spin-button,
+.calendario-solo-icono::-webkit-clear-button {
+  display: none;
+}
