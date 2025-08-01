@@ -35,11 +35,25 @@ export const VehicleCard = (props) => {
       .catch(error => {
         console.error('Error:', error)
         //alert('Hubo un error al intentar eliminar el vehículo')
+
+        const alertContainer = document.getElementById("alert-container");
+    alertContainer.innerHTML = `
+    <div class="alert alert-danger" role="alert">
+      El vehiculo no pudo ser eliminado porque esta asociado a una orden de trabajo.
+    </div>
+  `;
+    setTimeout(() => {
+    alertContainer.innerHTML = "";
+    }, 5000);
+
+
       })
   }
   return (
     <div>
+      
       <div className="card border border-2 border-primary mb-3 rounded-4" style={{ Width: "100%" }}>
+        <div id="alert-container"></div>
         <div className="row g-0">
           <div className="col-md-4 d-flex align-items-center justify-content-center">
             <img src="https://i.pinimg.com/736x/eb/21/8f/eb218ff389898aae7ae7b28894860ec5.jpg" className="p-2 m-2 img-fluid rounded-start" alt="..." />
@@ -55,7 +69,7 @@ export const VehicleCard = (props) => {
           <div className="col-md-2 p-4">
 
 
-            <button className='btn btn-light my-2 mx-5'><i className="fa-solid fa-pencil"></i></button>
+            
             <button onClick={() => {
               console.log(props.id_vehiculo)
               eliminarVehiculo(props.id_vehiculo)
