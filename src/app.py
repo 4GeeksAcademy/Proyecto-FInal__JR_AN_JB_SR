@@ -105,14 +105,13 @@ def get_orden_de_trabajo():
     print(nombre_usuario)
 
     if rol_usuario == "Cliente":
-        ordenes_de_trabajo = Orden_de_trabajo.query.filter_by(
-            usuario_id=id_propietario).all()
+
+        ordenes_de_trabajo = Orden_de_trabajo.query.filter_by(usuario_id = id_propietario).all()    
         print(ordenes_de_trabajo)
     else:
-        ordenes_de_trabajo = Orden_de_trabajo.query.filter_by(
-            mecanico_id=id_propietario).all()
+        ordenes_de_trabajo = Orden_de_trabajo.query.filter_by(mecanico_id = id_propietario).all()    
         print(ordenes_de_trabajo)
-
+    
     ot_serialized_by_user = []
 
     for orden_de_trabajo in ordenes_de_trabajo:
@@ -124,7 +123,38 @@ def get_orden_de_trabajo():
 # 🔹 REGISTRO DE USUARIO
 
 
+
+#ENDPOINT PARA MODIFICAR ORDENES DE TRABAJO
+@app.route('/modificar_orden/<int:id_ot>', methods = ['PUT'])
+@jwt_required()
+def modificar_orden(id_ot):
+    email_user_current = get_jwt_identity()
+    user_current = User.query.filter_by(email=email_user_current).first()
+    print(user_current)
+    ot_to_update = Orden_de_trabajo.query.get(id_ot)
+    print("esta es la OT a actualizar")
+    print(ot_to_update)
+
+
+    body = request.get_json()
+    if body is None:
+        return jsonify({'msg': 'No se envio informacion para actualizar' }), 404
+
+    if 'estado_servicio' in body:
+        ot_to_update.estado_servicio = body['estado_servicio']
+    if 'fecha_final' in body:
+        ot_to_update.fecha_final = body['fecha_final']
+    
+    db.session.commit()
+       
+    return jsonify({'msg': 'ok', 'ot': ot_to_update.serialize()}), 200
+    
+
+
+#ENDPOINT PARA REGISTRAR NUEVO USUARIO
+
 @app.route('/register', methods=['POST'])
+
 def register_user():
     body = request.get_json(silent=True)
     if not body:
