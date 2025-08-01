@@ -6,6 +6,7 @@ export const InicioMecanico = () => {
   const [ordenDeTrabajo, setOrdenDeTrabajo] = useState([])
   const [fechaTemp, setFechaTemp] = useState()
 
+  
   function traer_ordenes_de_servicio() {
 
     const token = localStorage.getItem("jwt_token")
@@ -29,8 +30,9 @@ export const InicioMecanico = () => {
 
 
   function updateInfo(id_ot, fecha_final, estado_servicio) {
+    //ACA VA LO LOGICA, SI ESTADO ES INGRESADO O EN_PROCESO FECHA FINAL= NULL Y GENERA ALARMA
+    //SI ESTADO ES FINALIZADO FECHA NO PUEDE SER NULL
     let newData ={
-      "id_ot": id_ot,
       "fecha_final": fecha_final,
       "estado_servicio": estado_servicio
     }
@@ -53,6 +55,7 @@ export const InicioMecanico = () => {
     })
     .then((data)=>{
       console.log(data.msg)
+
       traer_ordenes_de_servicio()
 
     })
@@ -71,10 +74,10 @@ export const InicioMecanico = () => {
       return <span className="badge rounded-pill bg-warning">En Proceso</span>;
     }
     else if (estado == 'Ingresado') {
-      return <span className="badge rounded-pill bg-danger">Ingresado</span>;
+      return <span className="badge rounded-pill bg-success">Ingresado</span>;
     }
     else
-      return <span className="badge rounded-pill bg-success text-light">Finalizado</span>;
+      return <span className="badge rounded-pill bg-danger text-light">Finalizado</span>;
   };
 
   return (
@@ -107,13 +110,13 @@ export const InicioMecanico = () => {
                   <td>{orden.matricula_vehiculo}</td>
                   <td>{orden.nombre_mecanico}</td>
                   <td>{orden.servicios_asociados.map(s => s.servicio.name_service).join(", ")}</td>
-                  <td>{orden.fecha_ingreso}</td>
-                  <td>  <input
+                  <td>{orden.fecha_ingreso.slice(0, 16)}</td>
+                  <td> {orden.fecha_final == null ? <input
                     type="date"
                     className="form-control"
-                    //value={orden.fecha_final}
+                    value={orden.fecha_final}
                     onChange={(e) => {setFechaTemp(e.target.value)}}
-                  /></td>
+                  /> : orden.fecha_final.slice(0, 16) }</td>
                   <td>{getEstadoBadge(orden.estado_servicio)}</td>
                   <td>
                     <div className="dropdown">
@@ -122,10 +125,12 @@ export const InicioMecanico = () => {
                       </button>
                       <ul className="dropdown-menu">
                         <li><button onClick={() => {
+                          setFechaTemp(null)
                           updateInfo(orden.id_ot, fechaTemp, "INGRESADO");
                         }} className="dropdown-item">Ingresado</button></li>
 
                         <li><button onClick={() => {
+                          setFechaTemp(null)
                           updateInfo(orden.id_ot, fechaTemp, "EN_PROCESO");
                         }} className="dropdown-item">En proceso</button></li>
 
