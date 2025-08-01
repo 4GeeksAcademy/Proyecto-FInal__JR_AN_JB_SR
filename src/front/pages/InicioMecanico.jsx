@@ -30,8 +30,21 @@ export const InicioMecanico = () => {
 
 
   function updateInfo(id_ot, fecha_final, estado_servicio) {
+
+    console.log(estado_servicio)
+    console.log(fecha_final)
     //ACA VA LO LOGICA, SI ESTADO ES INGRESADO O EN_PROCESO FECHA FINAL= NULL Y GENERA ALARMA
     //SI ESTADO ES FINALIZADO FECHA NO PUEDE SER NULL
+    if(estado_servicio == "INGRESADO" || estado_servicio == "EN_PROCESO"){
+      fecha_final = null
+    }
+    else {
+      fecha_final = fecha_final
+    }
+    console.log("va de nuevo")
+    console.log(estado_servicio)
+    console.log(fecha_final)
+
     let newData ={
       "fecha_final": fecha_final,
       "estado_servicio": estado_servicio
@@ -55,6 +68,16 @@ export const InicioMecanico = () => {
     })
     .then((data)=>{
       console.log(data.msg)
+      
+    const alertContainer = document.getElementById("alert-container");
+    alertContainer.innerHTML = `
+    <div class="alert alert-success" role="alert">
+      Orden actualizada correctamente.
+    </div>
+  `;
+    setTimeout(() => {
+    alertContainer.innerHTML = "";
+    }, 5000);
 
       traer_ordenes_de_servicio()
 
@@ -90,6 +113,7 @@ export const InicioMecanico = () => {
         </div>
 
         <div className="">
+          <div id="alert-container"></div>
           <table className="table table-bordered table-hover text-center align-middle">
             <thead className="table-light">
               <tr>
