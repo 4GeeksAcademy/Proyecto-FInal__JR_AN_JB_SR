@@ -19,8 +19,15 @@ from flask_jwt_extended import get_jwt_identity
 from flask_jwt_extended import jwt_required
 from flask_jwt_extended import JWTManager
 
+from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required, JWTManager
 from flask_cors import CORS
+from flask_mail import Mail, Message
+import random
+from werkzeug.security import generate_password_hash
 
+# 🔹 Variable global para almacenar códigos de recuperación temporalmente
+reset_codes = {}
+verified_emails = {}
 
 # from models import Person
 
@@ -57,6 +64,18 @@ setup_commands(app)
 app.register_blueprint(api, url_prefix='/api')
 
 # Handle/serialize errors like a JSON object
+
+# ************************************************************** Configuración de Flask-Mail
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USE_SSL'] = False
+app.config['MAIL_USERNAME'] = 'pruebaautotek@gmail.com'  # tu correo
+app.config['MAIL_PASSWORD'] = 'hzyp ztmh iteh bevk'      # tu App Password
+app.config['MAIL_DEFAULT_SENDER'] = ('Soporte AutoTek', 'tucorreo@gmail.com')
+mail = Mail(app)
+
+
 
 
 @app.errorhandler(APIException)
@@ -326,7 +345,93 @@ def update_user_profile(user_id):
         db.session.rollback()
         print(f"Error al actualizar perfil de usuario: {e}")
         return jsonify({'msg': 'Error al actualizar el perfil de usuario', 'error': str(e)}), 500
-      
+
+
+#  ***********************************************RECUPERAR CONTRASEÑA (SOLO UNA FUNCIÓN)
+
+
+@app.route("/recuperar-password", methods=["POST"])
+def recuperar_password():
+    data = request.get_json()
+    email = data.get("email")
+
+    if not email:
+        return jsonify({"message": "El email es requerido"}), 400
+
+    user = User.query.filter_by(email=email).first()
+    if not user:
+        return jsonify({"message": "El correo no está registrado"}), 404
+
+    #  GENERAR CÓDIGO DE 6 DÍGITOS
+    codigo = str(random.randint(100000, 999999))
+
+    #  GUARDAR CÓDIGO EN MEMORIA
+    reset_codes[email] = codigo
+    print(f" Código generado para {email}: {codigo}")
+
+    #  ENVIAR CORREO
+    try:
+        msg = Message("Código de recuperación de contraseña",
+                      recipients=[email])
+        msg.body = f"""
+        Hola {user.nombre},
+
+        Tu código de recuperación es: {codigo}
+
+        Ingresa este código en la web para restablecer tu contraseña.
+        """
+        mail.send(msg)
+
+        return jsonify({"message": "Se ha enviado un correo con tu código de recuperación"}), 200
+    except Exception as e:
+        print("❌ Error enviando correo:", e)
+        return jsonify({"message": "Hubo un problema al enviar el correo"}), 500
+
+# *************************************************************VERIFICAR CÓDIGO
+
+
+@app.route("/verificar-codigo", methods=["POST"])
+def verificar_codigo():
+    data = request.get_json()
+    email = data.get("email")
+    codigo = data.get("codigo")
+
+    if not email or not codigo:
+        return jsonify({"message": "Email y código son requeridos"}), 400
+
+    if email in reset_codes and reset_codes[email] == codigo:
+        verified_emails[email] = True
+        del reset_codes[email]
+        return jsonify({"message": "Código correcto. Ahora puedes restablecer tu contraseña."}), 200
+    else:
+        return jsonify({"message": "Código incorrecto o expirado."}), 400
+
+# ******************************************************************CAMBIAR CONTRASEÑA
+
+
+@app.route("/resetPassword", methods=["POST"])
+def cambiar_password():
+    data = request.get_json()
+    email = data.get("email")
+    codigo = data.get("codigo")
+    nueva_password = data.get("password")
+
+    if not email or not codigo or not nueva_password:
+        return jsonify({"message": "Faltan datos"}), 400
+
+    if email not in verified_emails or not verified_emails[email]:
+        return jsonify({"message": "Primero debes verificar el código de recuperacón"}), 400
+
+    user = User.query.filter_by(email=email).first()
+    if not user:
+        return jsonify({"message": "Usuario no encontrado"}), 400
+
+    user.password = nueva_password  # generate_password_hash(nueva_password)
+    db.session.commit()
+
+    del verified_emails[email]
+
+    return jsonify({"message": "Contraseña cambiada con éxito"}), 200
 
 # this only runs if `$ python src/main.py` is executed
 if __name__ == '__main__':

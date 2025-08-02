@@ -131,11 +131,13 @@ export const Login = () => {
                                         <button type="submit" className="btn btn-primary btn-lg" disabled={isLoading}>
                                             {isLoading && <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>}Login</button>
                                     </div>
+
                                     <div className="text-center mt-5">
-                                        <a href="#" className="fw-bold"
+                                        <Link to="/resetPassword" className="fw-bold"
                                             disabled={isLoading}
-                                        >¿Has olvidado tu contraseña?</a>
+                                        >¿Has olvidado tu contraseña?</Link>
                                     </div>
+
                                 </form>
                             </div>
 
