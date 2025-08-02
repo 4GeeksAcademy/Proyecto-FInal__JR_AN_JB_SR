@@ -34,7 +34,7 @@ export const NavbarMecanico = () => {
           <ul className="navbar-nav align-items-center">
             
             <li className="nav-item">
-              <Link className="nav-link" to="/services">Órdenes de trabajo</Link>
+              <Link className="nav-link" to="/inicioMecanico">Órdenes de trabajo</Link>
             </li>
             <li className="nav-item">
               <Link className="nav-link" to="/contact">Notificaciones</Link>

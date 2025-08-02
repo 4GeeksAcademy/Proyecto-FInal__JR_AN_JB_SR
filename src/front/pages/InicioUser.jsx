@@ -36,10 +36,10 @@ export const InicioUser = () => {
       return <span className="badge rounded-pill bg-warning">En Proceso</span>;
     }
     else if (estado == 'Ingresado'){
-      return <span className="badge rounded-pill bg-danger">Ingresado</span>;
+      return <span className="badge rounded-pill bg-success">Ingresado</span>;
       }
     else 
-      return <span className="badge rounded-pill bg-success text-light">Finalizado</span>;
+      return <span className="badge rounded-pill bg-danger text-light">Finalizado</span>;
   };
 
   return (
