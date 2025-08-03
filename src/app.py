@@ -6,7 +6,7 @@ from flask import Flask, request, jsonify, url_for, send_from_directory
 from flask_migrate import Migrate
 from flask_swagger import swagger
 from api.utils import APIException, generate_sitemap
-from api.models import db, User, RolEnum, Vehiculos, Orden_de_trabajo
+from api.models import db, User, RolEnum, Vehiculos, Orden_de_trabajo, Servicio
 
 #from twilio.rest import Client
 
@@ -470,6 +470,83 @@ def cambiar_password():
     del verified_emails[email]
 
     return jsonify({"message": "Contraseña cambiada con éxito"}), 200
+
+# Sección de NUEVA ORDEN DE SERVICIO ***************************************************
+
+@app.route("/ordenes", methods=["POST"])
+def crear_orden():
+    try:
+        data = request.get_json()
+
+        # Validamos que estén los datos mínimos
+        fecha_ingreso = data.get("fecha_ingreso")
+        estado_servicio = data.get("estado_servicio")
+        usuario_id = data.get("usuario_id")
+        vehiculo_id = data.get("vehiculo_id")
+        mecanico_id = data.get("mecanico_id")
+
+        if not fecha_ingreso or not estado_servicio or not usuario_id or not vehiculo_id or not mecanico_id:
+            return jsonify({"message": "Faltan datos obligatorios"}), 400
+
+        # Convertimos la fecha de string a datetime.date
+        import datetime
+        fecha_ingreso_date = datetime.datetime.strptime(
+            fecha_ingreso, "%Y-%m-%d").date()
+
+        # 🛠 Creamos la orden
+        nueva_orden = Orden_de_trabajo(
+            fecha_ingreso=fecha_ingreso_date,
+            estado_servicio=estado_servicio,  # debe coincidir con el Enum en tu modelo
+            usuario_id=usuario_id,
+            vehiculo_id=vehiculo_id,
+            mecanico_id=mecanico_id,
+            fecha_final=None  # por ahora puede quedar vacía
+        )
+
+        db.session.add(nueva_orden)
+        db.session.commit()
+
+        return jsonify({"message": "Orden de servicio creada con éxito", "orden": nueva_orden.serialize()}), 201
+
+    except Exception as e:
+        print(" Error al crear la orden:", e)
+        return jsonify({"message": "Error al crear la orden", "error": str(e)}), 500
+
+# ***************Busca usuario por identificacion
+
+
+@app.route('/usuarios/<int:identificacion>', methods=['GET'])
+def get_usuario_por_identificacion(identificacion):
+    usuario = User.query.filter_by(identificacion=identificacion).first()
+    if not usuario:
+        return jsonify({"message": "Usuario no encontrado"}), 404
+    return jsonify(usuario.serialize()), 200
+
+# ****************Lista Vehiculos del Usuario
+
+
+@app.route('/usuarios/<int:user_id>/vehiculos', methods=['GET'])
+def get_vehiculos_usuario(user_id):
+    vehiculos = Vehiculos.query.filter_by(user_id=user_id).all()
+    return jsonify([v.serialize() for v in vehiculos]), 200
+
+
+# **********************Lista Los Servicios
+
+@app.route('/servicios', methods=['GET'])
+def get_servicios():
+    servicios = Servicio.query.all()
+    return jsonify([s.serialize() for s in servicios]), 200
+
+# **********************Lista Los Mecanicos
+
+@app.route('/mecanicos', methods=['GET'])
+def get_mecanicos():
+    mecanicos = User.query.filter_by(rol=RolEnum.MECANICO).all()
+    return jsonify([m.serialize() for m in mecanicos]), 200
+
+
+#************************************************* PARA ENVIAR LA ORDEN A LA BASE
 
 # this only runs if `$ python src/main.py` is executed
 if __name__ == '__main__':

@@ -15,6 +15,7 @@ import { Register } from "./pages/Register";
 import { InicioUser } from "./pages/InicioUser";
 import { InicioMecanico } from "./pages/InicioMecanico";
 import { ResetPassword } from "./pages/ResetPassword";
+import { NuevaOrden } from "./pages/NuevaOrden"
 
 
 
@@ -41,6 +42,7 @@ export const router = createBrowserRouter(
         <Route path="/iniciomecanico" element={<InicioMecanico/>} />
 
         <Route path="/resetPassword" element={<ResetPassword/>} />
+        <Route path="/nuevaOrden" element={<NuevaOrden/>} />
         
       </Route>
     )

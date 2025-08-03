@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { NavbarUser } from "../components/NavbarUser";
+import { Link } from "react-router-dom";
 
 
 export const InicioUser = () => {
@@ -48,7 +49,11 @@ export const InicioUser = () => {
 
       <div className="container mt-4">
         <div className="text-center mb-3">
-          <button className="btn btn-info text-white px-4 py-2 fw-bold">Generar Nueva Órden</button>
+          <Link to="/nuevaOrden">
+          <button className="btn btn-info text-white px-4 py-2 fw-bold">
+            Generar Nueva Órden
+          </button>
+          </Link>
         </div>
 
         <div className="table-responsive">
