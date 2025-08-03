@@ -36,9 +36,7 @@ export const NavbarMecanico = () => {
             <li className="nav-item">
               <Link className="nav-link" to="/inicioMecanico">Órdenes de trabajo</Link>
             </li>
-            <li className="nav-item">
-              <Link className="nav-link" to="/contact">Notificaciones</Link>
-            </li>
+
             <li className="nav-item">
               <button onClick={handleLogout} className="btn btn-info ms-3" to="/" >LogOut</button>
             </li>

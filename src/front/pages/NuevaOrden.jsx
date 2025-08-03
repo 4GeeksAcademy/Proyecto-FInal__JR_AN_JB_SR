@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { NavbarUser } from "../components/NavbarUser";
 
 export const NuevaOrden = () => {
     const [formData, setFormData] = useState({
@@ -137,8 +138,11 @@ export const NuevaOrden = () => {
     };
 
     return (
+
+        
         <div className="container mt-4">
-            <h2>📄 Nueva Orden de Servicio</h2>
+            <NavbarUser/>
+            <h2 className="mb-3 mt-5 ">📄 Nueva Orden de Servicio</h2>
 
             {/* 🔍 Buscar usuario */}
             <div className="mb-3 d-flex">

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react"
 import rigoImageUrl from "../assets/img/rigo-baby.jpg";
 import useGlobalReducer from "../hooks/useGlobalReducer.jsx";
 import { Navbar } from "../components/Navbar"
-import { NavbarMecanico } from "../components/NavbarMecanico.jsx"
+import { NavbarUser } from "../components/NavbarUser.jsx"
 import { VehicleCard } from "../components/VehicleCard.jsx";
 import { matchPath, useNavigate } from "react-router-dom";
 
@@ -124,7 +124,7 @@ export const Vehiculos = () => {
 
   return (
     <div>
-      <NavbarMecanico />
+      <NavbarUser />
 
       <div className='container text-center mt-5 mb-3'>
         <div>
