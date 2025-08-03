@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { NavbarUser } from "../components/NavbarUser";
+import { Link } from "react-router-dom";
 
 
 export const InicioUser = () => {
@@ -32,14 +33,14 @@ export const InicioUser = () => {
     }, [])
 
   const getEstadoBadge = (estado) => {
-    if (estado === 'En Proceso') {
+    if (estado === 'En proceso') {
       return <span className="badge rounded-pill bg-warning">En Proceso</span>;
     }
     else if (estado == 'Ingresado'){
-      return <span className="badge rounded-pill bg-danger">Ingresado</span>;
+      return <span className="badge rounded-pill bg-success">Ingresado</span>;
       }
     else 
-      return <span className="badge rounded-pill bg-success text-light">Finalizado</span>;
+      return <span className="badge rounded-pill bg-danger text-light">Finalizado</span>;
   };
 
   return (
@@ -48,7 +49,11 @@ export const InicioUser = () => {
 
       <div className="container mt-4">
         <div className="text-center mb-3">
-          <button className="btn btn-info text-white px-4 py-2 fw-bold">Generar Nueva Órden</button>
+          <Link to="/nuevaOrden">
+          <button className="btn btn-info text-white px-4 py-2 fw-bold">
+            Generar Nueva Órden
+          </button>
+          </Link>
         </div>
 
         <div className="table-responsive">
@@ -71,7 +76,7 @@ export const InicioUser = () => {
                   <td>{orden.matricula_vehiculo}</td>
                   <td>{orden.nombre_mecanico}</td>
                   <td>{orden.servicios_asociados.map(s => s.servicio.name_service).join(", ")}</td>
-                  <td>{orden.fecha_ingreso}</td>
+                  <td>{orden.fecha_ingreso.slice(0, 16)}</td>
                   <td>{orden.fecha_final}</td>
                   <td>{getEstadoBadge(orden.estado_servicio)}</td>
                 </tr>

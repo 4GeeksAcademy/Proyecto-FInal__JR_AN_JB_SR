@@ -90,7 +90,7 @@ export const Servicios = () => {
 
                 <div className="text-center my-5">
                     <Link
-                        to="/agendar-cita"
+                        to="/login"
                         className="btn btn-lg px-4 rounded-pill shadow"
                         style={{ backgroundColor: '#003366', color: 'white' }}
                     >

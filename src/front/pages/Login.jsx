@@ -1,6 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 import React, { useState, useEffect } from 'react';
 import "../login.css";
+import LogoUrl from "../assets/img/logoAutoTekCeleste.svg";
 
 export const Login = () => {
     const [email, setEmail] = useState('');
@@ -78,7 +79,7 @@ export const Login = () => {
                     </div>
                     <div className="col-md-7 d-none d-md-flex left-panel">
                         <div className="d-flex flex-column justify-content-center align-items-center text-center w-100">
-                            <img src="tu-ruta-al-logo.png" alt="AutoTekc Logo" className="img-fluid mb-4" />
+                            <img src={LogoUrl} alt="AutoTekc Logo" className="img-fluid mb-4" />
                             <h1 className="logo-text fw-bold mb-3" style={{ fontSize: '2.8rem' }}>AutoTekc</h1>
                             <h4 className="text-dark-emphasis mb-0" style={{ maxWidth: '600px' }}>Conduciendo hacia el futuro del cuidado automotriz. Ingresa para gestionar tu experiencia.</h4>
                         </div>
@@ -131,11 +132,13 @@ export const Login = () => {
                                         <button type="submit" className="btn btn-primary btn-lg" disabled={isLoading}>
                                             {isLoading && <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>}Login</button>
                                     </div>
+
                                     <div className="text-center mt-5">
-                                        <a href="#" className="fw-bold"
+                                        <Link to="/resetPassword" className="fw-bold"
                                             disabled={isLoading}
-                                        >¿Has olvidado tu contraseña?</a>
+                                        >¿Has olvidado tu contraseña?</Link>
                                     </div>
+
                                 </form>
                             </div>
 

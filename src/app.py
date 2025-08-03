@@ -6,7 +6,9 @@ from flask import Flask, request, jsonify, url_for, send_from_directory
 from flask_migrate import Migrate
 from flask_swagger import swagger
 from api.utils import APIException, generate_sitemap
-from api.models import db, User, RolEnum, Vehiculos, Orden_de_trabajo
+from api.models import db, User, RolEnum, Vehiculos, Orden_de_trabajo, Servicio, AuxOrdenServicio
+
+#from twilio.rest import Client
 
 from datetime import timedelta
 
@@ -19,8 +21,15 @@ from flask_jwt_extended import get_jwt_identity
 from flask_jwt_extended import jwt_required
 from flask_jwt_extended import JWTManager
 
+from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required, JWTManager
 from flask_cors import CORS
+from flask_mail import Mail, Message
+import random
+from werkzeug.security import generate_password_hash
 
+# 🔹 Variable global para almacenar códigos de recuperación temporalmente
+reset_codes = {}
+verified_emails = {}
 
 # from models import Person
 
@@ -58,6 +67,18 @@ app.register_blueprint(api, url_prefix='/api')
 
 # Handle/serialize errors like a JSON object
 
+# ************************************************************** Configuración de Flask-Mail
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USE_SSL'] = False
+app.config['MAIL_USERNAME'] = 'pruebaautotek@gmail.com'  # tu correo
+app.config['MAIL_PASSWORD'] = 'hzyp ztmh iteh bevk'      # tu App Password
+app.config['MAIL_DEFAULT_SENDER'] = ('Soporte AutoTek', 'tucorreo@gmail.com')
+mail = Mail(app)
+
+
+
 
 @app.errorhandler(APIException)
 def handle_invalid_usage(error):
@@ -90,9 +111,17 @@ def get_orden_de_trabajo():
     email_user_current = get_jwt_identity()
     user_current = User.query.filter_by(email=email_user_current).first()
     id_propietario = user_current.id_user
-    ordenes_de_trabajo = Orden_de_trabajo.query.filter_by(usuario_id = id_propietario).all()    
-    print(ordenes_de_trabajo)
-    
+    rol_usuario = user_current.rol.value
+    nombre_usuario = user_current.nombre
+    print(nombre_usuario)
+
+    if rol_usuario == "Cliente":
+        ordenes_de_trabajo = Orden_de_trabajo.query.filter_by(usuario_id = id_propietario).all()    
+        print(ordenes_de_trabajo)
+    else:
+        ordenes_de_trabajo = Orden_de_trabajo.query.filter_by(mecanico_id = id_propietario).all()    
+        print(ordenes_de_trabajo)
+                                                                    
     ot_serialized_by_user = []
 
     for orden_de_trabajo in ordenes_de_trabajo:
@@ -100,6 +129,34 @@ def get_orden_de_trabajo():
 
     print(ot_serialized_by_user)
     return jsonify({'msg':'ok', 'ordenes_de_trabajo':ot_serialized_by_user})
+
+
+#ENDPOINT PARA MODIFICAR ORDENES DE TRABAJO
+
+@app.route('/modificar_orden/<int:id_ot>', methods = ['PUT'])
+@jwt_required()
+def modificar_orden(id_ot):
+    email_user_current = get_jwt_identity()
+    user_current = User.query.filter_by(email=email_user_current).first()
+    print(user_current)
+    ot_to_update = Orden_de_trabajo.query.get(id_ot)
+    print("esta es la OT a actualizar")
+    print(ot_to_update)
+
+
+    body = request.get_json()
+    if body is None:
+        return jsonify({'msg': 'No se envio informacion para actualizar' }), 404
+
+    if 'estado_servicio' in body:
+        ot_to_update.estado_servicio = body['estado_servicio']
+    if 'fecha_final' in body:
+        ot_to_update.fecha_final = body['fecha_final']
+    
+    db.session.commit()
+       
+    return jsonify({'msg': 'ok', 'ot': ot_to_update.serialize()}), 200
+    
 
 
 #ENDPOINT PARA REGISTRAR NUEVO USUARIO
@@ -326,7 +383,201 @@ def update_user_profile(user_id):
         db.session.rollback()
         print(f"Error al actualizar perfil de usuario: {e}")
         return jsonify({'msg': 'Error al actualizar el perfil de usuario', 'error': str(e)}), 500
-      
+
+
+#  ***********************************************RECUPERAR CONTRASEÑA (SOLO UNA FUNCIÓN)
+
+
+@app.route("/recuperar-password", methods=["POST"])
+def recuperar_password():
+    data = request.get_json()
+    email = data.get("email")
+
+    if not email:
+        return jsonify({"message": "El email es requerido"}), 400
+
+    user = User.query.filter_by(email=email).first()
+    if not user:
+        return jsonify({"message": "El correo no está registrado"}), 404
+
+    #  GENERAR CÓDIGO DE 6 DÍGITOS
+    codigo = str(random.randint(100000, 999999))
+
+    #  GUARDAR CÓDIGO EN MEMORIA
+    reset_codes[email] = codigo
+    print(f" Código generado para {email}: {codigo}")
+
+    #  ENVIAR CORREO
+    try:
+        msg = Message("Código de recuperación de contraseña",
+                      recipients=[email])
+        msg.body = f"""
+        Hola {user.nombre},
+
+        Tu código de recuperación es: {codigo}
+
+        Ingresa este código en la web para restablecer tu contraseña.
+        """
+        mail.send(msg)
+
+        return jsonify({"message": "Se ha enviado un correo con tu código de recuperación"}), 200
+    except Exception as e:
+        print("❌ Error enviando correo:", e)
+        return jsonify({"message": "Hubo un problema al enviar el correo"}), 500
+
+# *************************************************************VERIFICAR CÓDIGO
+
+
+@app.route("/verificar-codigo", methods=["POST"])
+def verificar_codigo():
+    data = request.get_json()
+    email = data.get("email")
+    codigo = data.get("codigo")
+
+    if not email or not codigo:
+        return jsonify({"message": "Email y código son requeridos"}), 400
+
+    if email in reset_codes and reset_codes[email] == codigo:
+        verified_emails[email] = True
+        del reset_codes[email]
+        return jsonify({"message": "Código correcto. Ahora puedes restablecer tu contraseña."}), 200
+    else:
+        return jsonify({"message": "Código incorrecto o expirado."}), 400
+
+# ******************************************************************CAMBIAR CONTRASEÑA
+
+
+@app.route("/resetPassword", methods=["POST"])
+def cambiar_password():
+    data = request.get_json()
+    email = data.get("email")
+    codigo = data.get("codigo")
+    nueva_password = data.get("password")
+
+    if not email or not codigo or not nueva_password:
+        return jsonify({"message": "Faltan datos"}), 400
+
+    if email not in verified_emails or not verified_emails[email]:
+        return jsonify({"message": "Primero debes verificar el código de recuperacón"}), 400
+
+    user = User.query.filter_by(email=email).first()
+    if not user:
+        return jsonify({"message": "Usuario no encontrado"}), 400
+
+    user.password = nueva_password  # generate_password_hash(nueva_password)
+    db.session.commit()
+
+    del verified_emails[email]
+
+    return jsonify({"message": "Contraseña cambiada con éxito"}), 200
+
+# Sección de NUEVA ORDEN DE SERVICIO ***************************************************
+
+@app.route("/ordenes", methods=["POST"])
+def crear_orden():
+    try:
+        data = request.get_json()
+
+        # Validamos que estén los datos mínimos
+        fecha_ingreso = data.get("fecha_ingreso")
+        estado_servicio = data.get("estado_servicio")
+        usuario_id = data.get("usuario_id")
+        vehiculo_id = data.get("vehiculo_id")
+        mecanico_id = data.get("mecanico_id")
+
+        if not fecha_ingreso or not estado_servicio or not usuario_id or not vehiculo_id or not mecanico_id:
+            return jsonify({"message": "Faltan datos obligatorios"}), 400
+
+        # Convertimos la fecha de string a datetime.date
+        import datetime
+        fecha_ingreso_date = datetime.datetime.strptime(
+            fecha_ingreso, "%Y-%m-%d").date()
+
+        # 🛠 Creamos la orden
+        nueva_orden = Orden_de_trabajo(
+            fecha_ingreso=fecha_ingreso_date,
+            estado_servicio=estado_servicio,  # debe coincidir con el Enum en tu modelo
+            usuario_id=usuario_id,
+            vehiculo_id=vehiculo_id,
+            mecanico_id=mecanico_id,
+            fecha_final=None  # por ahora puede quedar vacía
+        )
+
+        db.session.add(nueva_orden)
+        db.session.commit()
+
+        return jsonify({"message": "Orden de servicio creada con éxito", "orden": nueva_orden.serialize()}), 201
+
+    except Exception as e:
+        print(" Error al crear la orden:", e)
+        return jsonify({"message": "Error al crear la orden", "error": str(e)}), 500
+
+# ***************Busca usuario por identificacion
+
+
+@app.route('/usuarios/<int:identificacion>', methods=['GET'])
+def get_usuario_por_identificacion(identificacion):
+    usuario = User.query.filter_by(identificacion=identificacion).first()
+    if not usuario:
+        return jsonify({"message": "Usuario no encontrado"}), 404
+    return jsonify(usuario.serialize()), 200
+
+# ****************Lista Vehiculos del Usuario
+
+
+@app.route('/usuarios/<int:user_id>/vehiculos', methods=['GET'])
+def get_vehiculos_usuario(user_id):
+    vehiculos = Vehiculos.query.filter_by(user_id=user_id).all()
+    return jsonify([v.serialize() for v in vehiculos]), 200
+
+
+# **********************Lista Los Servicios
+
+@app.route('/servicios', methods=['GET'])
+def get_servicios():
+    servicios = Servicio.query.all()
+    return jsonify([s.serialize() for s in servicios]), 200
+
+# **********************Lista Los Mecanicos
+
+@app.route('/mecanicos', methods=['GET'])
+def get_mecanicos():
+    mecanicos = User.query.filter_by(rol=RolEnum.MECANICO).all()
+    return jsonify([m.serialize() for m in mecanicos]), 200
+
+
+#************************************************* PARA ENVIAR LA ORDEN A LA BASE
+
+@app.route('/asociar-servicios', methods=['POST'])
+def asociar_servicios_a_orden():
+    try:
+        data = request.get_json()
+        orden_id = data.get("orden_id")
+        servicios = data.get("servicios", [])
+        print("hola julian")
+        print(orden_id)
+        print(servicios)
+
+        if not orden_id or not servicios:
+            return jsonify({"msg": "orden_id y servicios son requeridos"}), 400
+
+        for servicio_id in servicios:
+            relacion = AuxOrdenServicio(
+                orden_id=orden_id,
+                servicio_id=servicio_id
+            )
+            db.session.add(relacion)
+
+        db.session.commit()
+        return jsonify({"msg": "Servicios asociados exitosamente"}), 201
+
+    except Exception as e:
+        db.session.rollback()
+        print("❌ Error al asociar servicios:", e)
+        return jsonify({"msg": "Error al asociar servicios", "error": str(e)}), 500
+
+
+##########################################################333
 
 # this only runs if `$ python src/main.py` is executed
 if __name__ == '__main__':

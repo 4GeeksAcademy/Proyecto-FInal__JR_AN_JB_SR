@@ -40,6 +40,9 @@ export const NavbarUser = () => {
               <Link className="nav-link" to="/about">Perfil</Link>
             </li>
             <li className="nav-item">
+              <Link className="nav-link" to="/inicioUser">Mis ordenes</Link>
+            </li>
+            <li className="nav-item">
               <button onClick={handleLogout} className="btn btn-info ms-3" to="/" >LogOut</button>
             </li>
           </ul>
