@@ -15,6 +15,16 @@ export const NuevaOrden = () => {
     const [vehiculos, setVehiculos] = useState([]);
     const [servicios, setServicios] = useState([]);
     const [mecanicos, setMecanicos] = useState([]);
+    const [id_orden, setId_Orden] = useState();
+
+
+    const [servicioSeleccionado, setServicioSeleccionado] = useState("");//*************** */
+
+    const handleChangeServicios = (e) => {
+        const valoresSeleccionados = Array.from(e.target.selectedOptions, option => option.index);
+        console.log("IDs seleccionados:", valoresSeleccionados);
+        setServicioSeleccionado(valoresSeleccionados)
+    };
 
     //  Cargar servicios al montar el componente
     useEffect(() => {
@@ -89,7 +99,8 @@ export const NuevaOrden = () => {
             const data = await response.json();
             if (response.ok) {
                 alert("✅ Orden creada con éxito");
-                console.log(data);
+                console.log(data.orden.id_ot);
+                setId_Orden(data.orden.id_ot);
             } else {
                 alert("❌ Error: " + data.message);
             }
@@ -97,7 +108,9 @@ export const NuevaOrden = () => {
             console.error("❌ Error enviando la orden:", error);
         }
 
-        
+    
+
+
     };
 
     return (
@@ -176,9 +189,9 @@ export const NuevaOrden = () => {
                 {/* Servicios múltiples */}
                 <div className="mb-3">
                     <label className="form-label">Servicios</label>
-                    <select name="servicios" className="form-control" multiple onChange={handleMecanicosChange}>
+                    <select name="servicios" className="form-control" multiple onChange={handleChangeServicios}>
                         {servicios.map((s) => (
-                            <option key={s.ide_service} value={s.ide_service}>
+                            <option key={s.id_service} value={s.id_service}>
                                 {s.name_service} - ${s.price}
                             </option>
                         ))}
