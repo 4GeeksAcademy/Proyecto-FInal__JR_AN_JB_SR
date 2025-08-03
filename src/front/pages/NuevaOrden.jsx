@@ -15,13 +15,13 @@ export const NuevaOrden = () => {
     const [vehiculos, setVehiculos] = useState([]);
     const [servicios, setServicios] = useState([]);
     const [mecanicos, setMecanicos] = useState([]);
-    const [id_orden, setId_Orden] = useState();
+    const [id_orden, setId_Orden] = useState([]);
 
 
     const [servicioSeleccionado, setServicioSeleccionado] = useState("");//*************** */
 
     const handleChangeServicios = (e) => {
-        const valoresSeleccionados = Array.from(e.target.selectedOptions, option => option.index);
+        const valoresSeleccionados = Array.from(e.target.selectedOptions, option => option.index+1);
         console.log("IDs seleccionados:", valoresSeleccionados);
         setServicioSeleccionado(valoresSeleccionados)
     };
@@ -89,7 +89,9 @@ export const NuevaOrden = () => {
     // 📤 Enviar la orden
     const handleSubmit = async (e) => {
         e.preventDefault();
+         let id_orden_nuevo = null
         try {
+             
             const response = await fetch(import.meta.env.VITE_BACKEND_URL + "ordenes", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -100,7 +102,8 @@ export const NuevaOrden = () => {
             if (response.ok) {
                 alert("✅ Orden creada con éxito");
                 console.log(data.orden.id_ot);
-                setId_Orden(data.orden.id_ot);
+                id_orden_nuevo = data.orden.id_ot
+                //setId_Orden(data.orden.id_ot);
             } else {
                 alert("❌ Error: " + data.message);
             }
@@ -108,9 +111,29 @@ export const NuevaOrden = () => {
             console.error("❌ Error enviando la orden:", error);
         }
 
-    
+        //aca va un fetch para crear la orden auxiliar con las variables id_orden y servicioSeleccionado
 
-
+        fetch(import.meta.env.VITE_BACKEND_URL + "asociar-servicios", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                orden_id: id_orden_nuevo,
+                servicios: servicioSeleccionado
+            })
+        })
+        .then((response)=>{
+            if(!response.ok){
+                alert("problemas al asociar el servicio")
+            }
+            return response.json()
+        })
+        .then((data)=>{
+            console.log(data)
+        })
+        .catch((err)=>{err})
+        
     };
 
     return (

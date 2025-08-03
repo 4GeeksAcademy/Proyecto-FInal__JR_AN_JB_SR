@@ -6,7 +6,7 @@ from flask import Flask, request, jsonify, url_for, send_from_directory
 from flask_migrate import Migrate
 from flask_swagger import swagger
 from api.utils import APIException, generate_sitemap
-from api.models import db, User, RolEnum, Vehiculos, Orden_de_trabajo, Servicio
+from api.models import db, User, RolEnum, Vehiculos, Orden_de_trabajo, Servicio, AuxOrdenServicio
 
 #from twilio.rest import Client
 
@@ -547,6 +547,37 @@ def get_mecanicos():
 
 
 #************************************************* PARA ENVIAR LA ORDEN A LA BASE
+
+@app.route('/asociar-servicios', methods=['POST'])
+def asociar_servicios_a_orden():
+    try:
+        data = request.get_json()
+        orden_id = data.get("orden_id")
+        servicios = data.get("servicios", [])
+        print("hola julian")
+        print(orden_id)
+        print(servicios)
+
+        if not orden_id or not servicios:
+            return jsonify({"msg": "orden_id y servicios son requeridos"}), 400
+
+        for servicio_id in servicios:
+            relacion = AuxOrdenServicio(
+                orden_id=orden_id,
+                servicio_id=servicio_id
+            )
+            db.session.add(relacion)
+
+        db.session.commit()
+        return jsonify({"msg": "Servicios asociados exitosamente"}), 201
+
+    except Exception as e:
+        db.session.rollback()
+        print("❌ Error al asociar servicios:", e)
+        return jsonify({"msg": "Error al asociar servicios", "error": str(e)}), 500
+
+
+##########################################################333
 
 # this only runs if `$ python src/main.py` is executed
 if __name__ == '__main__':
