@@ -124,7 +124,6 @@ export const Vehiculos = () => {
 
   return (
     <div>
-      <NavbarUser />
 
       <div className='container text-center mt-5 mb-3'>
         <div>

@@ -1,7 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 import React, { useState, useEffect } from 'react';
 import "../login.css";
-import LogoUrl from "../assets/img/logoAutoTekCeleste.svg";
+import logo_celeste from "../assets/img/logo_celeste.svg";
 
 export const Login = () => {
     const [email, setEmail] = useState('');
@@ -9,6 +9,8 @@ export const Login = () => {
     const [showPassword, setShowPassword] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [rememberMe, setRememberMe] = useState(false);
+    const [showErrorModal, setShowErrorModal] = useState(false);
+    const [errorMessage, setErrorMessage] = useState('');
 
     const navigate = useNavigate()
 
@@ -28,13 +30,18 @@ export const Login = () => {
         }
     }, []);
 
+    const handleCloseErrorModal = () => {
+        setShowErrorModal(false);
+        setErrorMessage('');
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setIsLoading(true);
 
 
         try {
-            const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/login`, {
+            const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}login`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -47,12 +54,12 @@ export const Login = () => {
             if (response.ok) {
                 localStorage.setItem('jwt_token', data.token);
                 console.log('✅ Verificación Exitosa: ¡Inicio de sesión correcto!');
-                console.log('🔑 Token JWT recibido y almacenado:', data.token);
                 console.log(data.tipo_de_usuario)
-                data.tipo_de_usuario == "Cliente" ? navigate('/inicioUser') : navigate('/inicioMecanico') 
+                data.tipo_de_usuario == "Cliente" ? navigate('/dashboard') : navigate('/inicioMecanico') 
             } else {
-                // Si hay un error en la respuesta del backend
-                console.error('❌ Verificación Fallida:', data.msg || 'Credenciales incorrectas.'); // Mensaje de error en consola
+                const errorMsg = data.msg || 'Credenciales incorrectas. Inténtalo de nuevo.';
+                setErrorMessage(errorMsg);
+                setShowErrorModal(true);
             }
             if (rememberMe) {
                 localStorage.setItem('rememberedEmail', email);
@@ -62,7 +69,9 @@ export const Login = () => {
                 localStorage.removeItem('rememberMeChecked');
             }
         } catch (error) {
-            console.error('🚨 Error de Conexión:', 'No se pudo conectar con el servidor. Verifica que el backend esté funcionando.', error); // Mensaje de error de conexión
+            setErrorMessage('🚨 Error de Conexión: No se pudo conectar con el servidor. Verifica que el backend esté funcionando.');
+            setShowErrorModal(true);
+            console.error('🚨 Error de Conexión:', 'No se pudo conectar con el servidor. Verifica que el backend esté funcionando.', error);
         } finally {
             setIsLoading(false);
         }
@@ -79,8 +88,7 @@ export const Login = () => {
                     </div>
                     <div className="col-md-7 d-none d-md-flex left-panel">
                         <div className="d-flex flex-column justify-content-center align-items-center text-center w-100">
-                            <img src={LogoUrl} alt="AutoTekc Logo" className="img-fluid mb-4" />
-                            <h1 className="logo-text fw-bold mb-3" style={{ fontSize: '2.8rem' }}>AutoTekc</h1>
+                            <img src={logo_celeste} alt="AutoTekc Logo" className="img-fluid mb-4" width={350}/>
                             <h4 className="text-dark-emphasis mb-0" style={{ maxWidth: '600px' }}>Conduciendo hacia el futuro del cuidado automotriz. Ingresa para gestionar tu experiencia.</h4>
                         </div>
                     </div>
@@ -132,19 +140,30 @@ export const Login = () => {
                                         <button type="submit" className="btn btn-primary btn-lg" disabled={isLoading}>
                                             {isLoading && <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>}Login</button>
                                     </div>
-
                                     <div className="text-center mt-5">
                                         <Link to="/resetPassword" className="fw-bold"
                                             disabled={isLoading}
                                         >¿Has olvidado tu contraseña?</Link>
                                     </div>
-
                                 </form>
                             </div>
 
                             <div className="register-section mt-auto">
                                 <p className="mb-0">¿Aún no tienes una cuenta? <Link to="/register" className="text-white fw-bold text-decoration-none">Regístrate acá</Link></p>
                             </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div className={`modal fade ${showErrorModal ? 'show d-block' : ''}`} tabIndex="-1" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
+                <div className="modal-dialog modal-dialog-centered">
+                    <div className="modal-content">
+                        <div className="modal-header">
+                            <h5 className="modal-title">Error de inicio de sesión</h5>
+                            <button type="button" className="btn-close" onClick={handleCloseErrorModal} aria-label="Close"></button>
+                        </div>
+                        <div className="modal-body">
+                            <p>{errorMessage}</p>
                         </div>
                     </div>
                 </div>

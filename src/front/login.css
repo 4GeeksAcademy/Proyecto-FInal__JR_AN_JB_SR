@@ -109,9 +109,6 @@
     min-height: 100vh;
     background-color: #f8f9fa;
     font-family: Arial, sans-serif;
-    display: flex;
-    overflow-y: hidden;
-    overflow-x: hidden;
 }
 
 .input-wrapper {
@@ -156,4 +153,53 @@
     cursor: pointer;
     padding-right: 0.75rem;
     padding-left: 0.75rem;
+}
+
+/* REGLAS CORREGIDAS PARA EL AVATAR Y LA IMAGEN */
+.profile-avatar {
+    position: relative; /* Agregamos esta línea para posicionar el botón de borrado */
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 3px solid #ccc;
+}
+
+.profile-avatar i {
+    font-size: 12rem;
+    color: #ced4da;
+}
+
+.profile-pic-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* NUEVO: Estilos para el botón de eliminación de foto */
+.profile-delete-btn {
+    position: absolute;
+    bottom: 5px; /* Posicionamos en la parte inferior */
+    left: 50%;
+    transform: translateX(-50%); /* Centramos horizontalmente */
+    opacity: 0.8; /* Hacemos el botón un poco transparente */
+    border-radius: 50%; /* Lo hacemos circular */
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.2s ease-in-out;
+}
+
+.profile-delete-btn:hover {
+    opacity: 1; /* Aumentamos la opacidad al pasar el mouse */
+}
+
+.profile-delete-btn .fas {
+    font-size: 1rem;
+    color: #fff;
 }
