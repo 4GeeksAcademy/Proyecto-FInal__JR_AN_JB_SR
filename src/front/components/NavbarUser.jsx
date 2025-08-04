@@ -1,14 +1,28 @@
 import { Link, useNavigate } from "react-router-dom";
+import React, { useState } from 'react';
 import logoB from "../assets/img/logoB.svg";
 
-export const NavbarUser = () => {
+export const NavbarUser = ({ onSectionChange, activeSection }) => { 
 
+  const [showModal, setShowModal] = useState(false);
   const navigate = useNavigate()
+
+  const handleShowModal = () => {
+        setShowModal(true);
+    };
+
+    const handleCloseModal = () => {
+        setShowModal(false);
+    };
 
     const handleLogout = () => {
     localStorage.removeItem("jwt_token");
-    //setIsLogged(false);
     navigate("/");
+    };
+
+    const handleConfirmLogout = () => {
+        handleLogout();
+        handleCloseModal(); // Cierra el modal después de cerrar la sesión
     };
 
   return (
@@ -31,21 +45,36 @@ export const NavbarUser = () => {
         <div className="collapse navbar-collapse justify-content-end" id="navbarNav">
           <ul className="navbar-nav align-items-center">
             <li className="nav-item">
-              <Link className="nav-link" to="/">Inicio</Link>
+              <a className={`nav-link ${activeSection === 'Inicio' ? 'active-custom' : ''}`} href="#" onClick={() => onSectionChange('Inicio')}>Inicio</a>
             </li>
             <li className="nav-item">
-              <Link className="nav-link" to="/vehiculos">Mis Vehículos</Link>
+              <a className={`nav-link ${activeSection === 'Vehiculos' ? 'active-custom' : ''}`} href="#" onClick={() => onSectionChange('Vehiculos')}>Vehículos</a>
             </li>
             <li className="nav-item">
-              <Link className="nav-link" to="/about">Perfil</Link>
+              <a className={`nav-link ${activeSection === 'Perfil' ? 'active-custom' : ''}`} href="#" onClick={() => onSectionChange('Perfil')}>Perfil</a>
             </li>
             <li className="nav-item">
-              <Link className="nav-link" to="/inicioUser">Mis ordenes</Link>
-            </li>
-            <li className="nav-item">
-              <button onClick={handleLogout} className="btn btn-info ms-3" to="/" >LogOut</button>
+              <button onClick={handleShowModal} className="text-white btn btn-info ms-3">LogOut</button>
             </li>
           </ul>
+          <div className={`modal fade ${showModal ? 'show d-block' : ''}`} tabIndex="-1" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
+                <div className="modal-dialog">
+                    <div className="modal-content">
+                        <div className="modal-header">
+                            <h5 className="modal-title">Cerrar Sesión</h5>
+                            <button type="button" className="btn-close" onClick={handleCloseModal} aria-label="Close"></button>
+                        </div>
+                        <div className="modal-body">
+                            <p>¿Estás seguro de querer cerrar tu sesión?</p>
+                        </div>
+                        <div className="modal-footer">
+                            <button type="button" className="btn btn-primary" onClick={handleConfirmLogout}>
+                                Sí
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
       </div>
     </nav>

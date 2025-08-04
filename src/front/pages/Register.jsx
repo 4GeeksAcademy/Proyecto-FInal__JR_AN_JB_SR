@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { useNavigate } from 'react-router-dom';
 import React, { useState, useEffect } from 'react';
+import logo_blanco_celeste from "../assets/img/logo_blanco_celeste.svg"
 
 export const Register = () => {
     const navigate = useNavigate();
@@ -80,7 +81,7 @@ export const Register = () => {
         };
 
         try {
-            const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}register`, { // Asume que tienes BACKEND_URL en tus variables de entorno
+            const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}register`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -126,12 +127,11 @@ export const Register = () => {
                         <div className="login-card register-card d-flex flex-column justify-content-between">
                             <div>
                                 <div className="text-center mb-4">
-                                    <img src="https://via.placeholder.com/100x40?text=AutoTekc" alt="AutoTekc Logo" className="img-fluid mb-3" /> {/* Reemplaza con tu logo */}
+                                    <img src={logo_blanco_celeste} alt="AutoTekc Logo" className="img-fluid mb-3" width={250}/>
                                     <h2 className="welcome-text">Regístrate</h2>
                                 </div>
 
                                 <form onSubmit={handleSubmit}>
-                                    {/* Mensajes de feedback */}
 
                                     {/* Nombre y Apellido */}
                                     <div className="input-group mb-3">

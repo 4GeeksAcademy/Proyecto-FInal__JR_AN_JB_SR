@@ -6,7 +6,7 @@ export const InicioMecanico = () => {
   const [ordenDeTrabajo, setOrdenDeTrabajo] = useState([])
   const [fechaTemp, setFechaTemp] = useState()
 
-  
+
   function traer_ordenes_de_servicio() {
 
     const token = localStorage.getItem("jwt_token")
@@ -35,7 +35,7 @@ export const InicioMecanico = () => {
     console.log(fecha_final)
     //ACA VA LO LOGICA, SI ESTADO ES INGRESADO O EN_PROCESO FECHA FINAL= NULL Y GENERA ALARMA
     //SI ESTADO ES FINALIZADO FECHA NO PUEDE SER NULL
-    if(estado_servicio == "INGRESADO" || estado_servicio == "EN_PROCESO"){
+    if (estado_servicio == "INGRESADO" || estado_servicio == "EN_PROCESO") {
       fecha_final = null
     }
     else {
@@ -45,7 +45,7 @@ export const InicioMecanico = () => {
     console.log(estado_servicio)
     console.log(fecha_final)
 
-    let newData ={
+    let newData = {
       "fecha_final": fecha_final,
       "estado_servicio": estado_servicio
     }
@@ -61,28 +61,28 @@ export const InicioMecanico = () => {
         "authorization": 'Bearer ' + token
       }
     })
-  
-    .then((response)=>{
-      if(!response.ok) throw new Error("Error al modificar la informacion");
-      return response.json()
-    })
-    .then((data)=>{
-      console.log(data.msg)
-      
-    const alertContainer = document.getElementById("alert-container");
-    alertContainer.innerHTML = `
+
+      .then((response) => {
+        if (!response.ok) throw new Error("Error al modificar la informacion");
+        return response.json()
+      })
+      .then((data) => {
+        console.log(data.msg)
+
+        const alertContainer = document.getElementById("alert-container");
+        alertContainer.innerHTML = `
     <div class="alert alert-success" role="alert">
       Orden actualizada correctamente.
     </div>
   `;
-    setTimeout(() => {
-    alertContainer.innerHTML = "";
-    }, 5000);
+        setTimeout(() => {
+          alertContainer.innerHTML = "";
+        }, 5000);
 
-      traer_ordenes_de_servicio()
+        traer_ordenes_de_servicio()
 
-    })
-    .catch((error)=>{error})
+      })
+      .catch((error) => { error })
 
   };
 
@@ -119,7 +119,6 @@ export const InicioMecanico = () => {
               <tr>
                 <th>Nro. de Órden</th>
                 <th>Vehículo</th>
-                <th>Mecanico</th>
                 <th>Servicios asignados</th>
                 <th>Fecha de ingreso</th>
                 <th>Fecha de salida</th>
@@ -132,15 +131,14 @@ export const InicioMecanico = () => {
                 <tr key={orden.id}>
                   <td>{orden.id_ot}</td>
                   <td>{orden.matricula_vehiculo}</td>
-                  <td>{orden.nombre_mecanico}</td>
                   <td>{orden.servicios_asociados.map(s => s.servicio.name_service).join(", ")}</td>
                   <td>{orden.fecha_ingreso.slice(0, 16)}</td>
                   <td> {orden.fecha_final == null ? <input
                     type="date"
                     className="form-control"
                     value={orden.fecha_final}
-                    onChange={(e) => {setFechaTemp(e.target.value)}}
-                  /> : orden.fecha_final.slice(0, 16) }</td>
+                    onChange={(e) => { setFechaTemp(e.target.value) }}
+                  /> : orden.fecha_final.slice(0, 16)}</td>
                   <td>{getEstadoBadge(orden.estado_servicio)}</td>
                   <td>
                     <div className="dropdown">

@@ -45,7 +45,6 @@ export const InicioUser = () => {
 
   return (
     <div>
-      <NavbarUser />
 
       <div className="container mt-4">
         <div className="text-center mb-3">
