@@ -32,13 +32,9 @@ export const NavbarMecanico = () => {
 
         <div className="collapse navbar-collapse justify-content-end" id="navbarNav">
           <ul className="navbar-nav align-items-center">
-            
-            <li className="nav-item">
-              <Link className="nav-link" to="/inicioMecanico">Órdenes de trabajo</Link>
-            </li>
 
             <li className="nav-item">
-              <button onClick={handleLogout} className="btn btn-info ms-3" to="/" >LogOut</button>
+              <button onClick={handleLogout} className="text-white btn btn-info ms-3" to="/" >LogOut</button>
             </li>
           </ul>
         </div>

@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from "react";
-import { NavbarUser } from "../components/NavbarUser";
+import { useNavigate } from "react-router-dom";
 
 export const NuevaOrden = () => {
+    const navigate = useNavigate();
+
     const [formData, setFormData] = useState({
         fecha_ingreso: "",
         estado_servicio: "",
         usuario_id: "",
         vehiculo_id: "",
-        mecanico: "",
+        mecanico_id: "",
         servicios: []  // <-- aquí guardaremos los ID de los servicios seleccionados
     });
 
@@ -19,10 +21,14 @@ export const NuevaOrden = () => {
     const [id_orden, setId_Orden] = useState([]);
 
 
+    const handleCancel = () => {
+        navigate("/dashboard");
+    };
+
     const [servicioSeleccionado, setServicioSeleccionado] = useState("");//*************** */
 
     const handleChangeServicios = (e) => {
-        const valoresSeleccionados = Array.from(e.target.selectedOptions, option => option.index+1);
+        const valoresSeleccionados = Array.from(e.target.selectedOptions, option => option.index + 1);
         console.log("IDs seleccionados:", valoresSeleccionados);
         setServicioSeleccionado(valoresSeleccionados)
     };
@@ -90,9 +96,9 @@ export const NuevaOrden = () => {
     // 📤 Enviar la orden
     const handleSubmit = async (e) => {
         e.preventDefault();
-         let id_orden_nuevo = null
+        let id_orden_nuevo = null
         try {
-             
+
             const response = await fetch(import.meta.env.VITE_BACKEND_URL + "ordenes", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -124,24 +130,25 @@ export const NuevaOrden = () => {
                 servicios: servicioSeleccionado
             })
         })
-        .then((response)=>{
-            if(!response.ok){
-                alert("problemas al asociar el servicio")
-            }
-            return response.json()
-        })
-        .then((data)=>{
-            console.log(data)
-        })
-        .catch((err)=>{err})
-        
+            .then((response) => {
+                if (!response.ok) {
+                    alert("problemas al asociar el servicio")
+                }
+                return response.json()
+
+            })
+
+            .then((data) => {
+                console.log(data)
+            })
+            .catch((err) => { err })
+        navigate("/dashboard");
+
     };
 
     return (
 
-        
-        <div className="container mt-4">
-            <NavbarUser/>
+        <div className="container">
             <h2 className="mb-3 mt-5 ">📄 Nueva Orden de Servicio</h2>
 
             {/* 🔍 Buscar usuario */}
@@ -225,13 +232,19 @@ export const NuevaOrden = () => {
                     </select>
                     <small className="form-text text-muted">Puedes seleccionar varios servicios (Ctrl+Click)</small>
                 </div>
-
-                <button type="submit" className="btn btn-primary">
-                    Crear Orden
-                </button>
+                <div className="d-flex justify-content-between">
+                    <button
+                        type="button"
+                        className="btn btn-secondary"
+                        onClick={handleCancel}
+                    >
+                        Cancelar
+                    </button>
+                    <button type="submit" className="btn btn-primary">
+                        Crear Orden
+                    </button>
+                </div>
             </form>
         </div>
     );
 };
-
-export default NuevaOrden;
