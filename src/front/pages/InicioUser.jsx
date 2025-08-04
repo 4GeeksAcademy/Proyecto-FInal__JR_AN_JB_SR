@@ -76,7 +76,7 @@ export const InicioUser = () => {
                   <td>{orden.nombre_mecanico}</td>
                   <td>{orden.servicios_asociados.map(s => s.servicio.name_service).join(", ")}</td>
                   <td>{orden.fecha_ingreso.slice(0, 16)}</td>
-                  <td>{orden.fecha_final}</td>
+                  <td>{orden.fecha_final.slice(0, 16)}</td>
                   <td>{getEstadoBadge(orden.estado_servicio)}</td>
                 </tr>
               ))}

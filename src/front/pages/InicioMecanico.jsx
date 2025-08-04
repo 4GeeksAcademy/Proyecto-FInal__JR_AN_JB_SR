@@ -6,6 +6,8 @@ export const InicioMecanico = () => {
   const [ordenDeTrabajo, setOrdenDeTrabajo] = useState([])
   const [fechaTemp, setFechaTemp] = useState()
 
+  const [ordenesFinalizadas, setOrdenesFinalizadas] = useState([]);
+
 
   function traer_ordenes_de_servicio() {
 
@@ -29,6 +31,17 @@ export const InicioMecanico = () => {
   }
 
 
+  function cerrarDropdown(id_ot) {
+    const dropdown = document.getElementById(`dropdown-${id_ot}`);
+    if (dropdown && dropdown.classList.contains("show")) {
+      dropdown.classList.remove("show"); // cierra el menú
+      const toggleBtn = dropdown.previousElementSibling;
+      if (toggleBtn) {
+        toggleBtn.setAttribute("aria-expanded", "false");
+      }
+    }
+  }
+
   function updateInfo(id_ot, fecha_final, estado_servicio) {
 
     console.log(estado_servicio)
@@ -40,6 +53,7 @@ export const InicioMecanico = () => {
     }
     else {
       fecha_final = fecha_final
+      setOrdenesFinalizadas((prev) => [...prev, id_ot]);
     }
     console.log("va de nuevo")
     console.log(estado_servicio)
@@ -80,7 +94,9 @@ export const InicioMecanico = () => {
         }, 5000);
 
         traer_ordenes_de_servicio()
-
+        if (estado_servicio === "FINALIZADO") {
+          setOrdenesFinalizadas((prev) => [...prev, id_ot]);
+        }
       })
       .catch((error) => { error })
 
@@ -133,19 +149,30 @@ export const InicioMecanico = () => {
                   <td>{orden.matricula_vehiculo}</td>
                   <td>{orden.servicios_asociados.map(s => s.servicio.name_service).join(", ")}</td>
                   <td>{orden.fecha_ingreso.slice(0, 16)}</td>
-                  <td> {orden.fecha_final == null ? <input
-                    type="date"
-                    className="form-control"
-                    value={orden.fecha_final}
-                    onChange={(e) => { setFechaTemp(e.target.value) }}
-                  /> : orden.fecha_final.slice(0, 16)}</td>
+                  <td>
+                    {orden.fecha_final == null ? (
+                      <input
+                        type="date"
+                        className="form-control"
+                        value={fechaTemp || ""} // Mostrar la fecha temporal correctamente
+                        onChange={(e) => setFechaTemp(e.target.value)}
+                        disabled={ordenesFinalizadas.includes(orden.id_ot)}
+                      />
+                    ) : orden.fecha_final.slice(0, 16)}
+                  </td>
                   <td>{getEstadoBadge(orden.estado_servicio)}</td>
                   <td>
                     <div className="dropdown">
-                      <button className="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                      <button
+                        className="btn btn-primary dropdown-toggle"
+                        type="button"
+                        data-bs-toggle="dropdown"
+                        aria-expanded="false"
+                        disabled={ordenesFinalizadas.includes(orden.id_ot)}
+                      >
                         Modificar Estado
                       </button>
-                      <ul className="dropdown-menu">
+                      <ul className="dropdown-menu" id={`dropdown-${orden.id_ot}`}>
                         <li><button onClick={() => {
                           setFechaTemp(null)
                           updateInfo(orden.id_ot, fechaTemp, "INGRESADO");
@@ -157,6 +184,7 @@ export const InicioMecanico = () => {
                         }} className="dropdown-item">En proceso</button></li>
 
                         <li><button onClick={() => {
+                          cerrarDropdown(orden.id_ot);
                           updateInfo(orden.id_ot, fechaTemp, "FINALIZADO");
                         }} className="dropdown-item">Finalizado</button></li>
                       </ul>
