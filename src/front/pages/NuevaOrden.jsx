@@ -69,6 +69,7 @@ export const NuevaOrden = () => {
 
     // 🔄 Manejar cambios en campos simples
     const handleChange = (e) => {
+        formData.estado_servicio="INGRESADO"
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
@@ -177,15 +178,7 @@ export const NuevaOrden = () => {
                 </div>
 
                 {/* Estado */}
-                <div className="mb-3">
-                    <label className="form-label">Estado del Servicio</label>
-                    <select name="estado_servicio" className="form-control" onChange={handleChange} value={formData.estado_servicio}>
-                        <option value="">Seleccione</option>
-                        <option value="INGRESADO">Pendiente</option>
-                        <option value="EN_PROCESO">En Proceso</option>
-                        <option value="FINALIZADO">Finalizado</option>
-                    </select>
-                </div>
+             
 
                 {/* Vehículos del usuario */}
                 <div className="mb-3">
