@@ -28,7 +28,7 @@ export const UserProfile = () => {
                     return;
                 }
                 
-                const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/profile`, {
+                const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}profile`, {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
@@ -91,7 +91,7 @@ export const UserProfile = () => {
                 foto_usuario: photoUrl
             };
             
-            const backendResponse = await fetch(`${import.meta.env.VITE_BACKEND_URL}/user/update-profile`, {
+            const backendResponse = await fetch(`${import.meta.env.VITE_BACKEND_URL}user/update-profile`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -146,7 +146,7 @@ export const UserProfile = () => {
                 foto_usuario: null 
             };
             
-            const backendResponse = await fetch(`${import.meta.env.VITE_BACKEND_URL}/user/update-profile`, {
+            const backendResponse = await fetch(`${import.meta.env.VITE_BACKEND_URL}user/update-profile`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',

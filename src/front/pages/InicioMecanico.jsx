@@ -67,7 +67,7 @@ export const InicioMecanico = () => {
     console.log(newData)
 
     const token = localStorage.getItem("jwt_token")
-    fetch(import.meta.env.VITE_BACKEND_URL + "/modificar_orden/" + id_ot, {
+    fetch(import.meta.env.VITE_BACKEND_URL + "modificar_orden/" + id_ot, {
       method: "PUT",
       body: JSON.stringify(newData),
       headers: {
