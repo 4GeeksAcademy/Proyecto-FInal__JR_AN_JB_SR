@@ -105,7 +105,7 @@ def serve_any_other_file(path):
 #CREACION DE ENDPOINT DEL PROYECTO
 
 #ENDPOINT PARA TRAER ORDENES DE TRABAJO
-@app.route('/ordenes_de_trabajo', methods = ['GET'])
+@app.route('/api/ordenes_de_trabajo', methods = ['GET'])
 @jwt_required()
 def get_orden_de_trabajo():
     email_user_current = get_jwt_identity()
@@ -133,7 +133,7 @@ def get_orden_de_trabajo():
 
 #ENDPOINT PARA MODIFICAR ORDENES DE TRABAJO
 
-@app.route('/modificar_orden/<int:id_ot>', methods = ['PUT'])
+@app.route('/api/modificar_orden/<int:id_ot>', methods = ['PUT'])
 @jwt_required()
 def modificar_orden(id_ot):
     email_user_current = get_jwt_identity()
@@ -160,7 +160,7 @@ def modificar_orden(id_ot):
 
 
 #ENDPOINT PARA REGISTRAR NUEVO USUARIO
-@app.route('/register', methods = ['POST'])
+@app.route('/api/register', methods = ['POST'])
 def register_user():
     body = request.get_json(silent=True)
     if body is None:
@@ -193,7 +193,7 @@ def register_user():
 
 #CREACION DEL ENDPOINT DE LOGIN
 
-@app.route('/login', methods = ['POST'])
+@app.route('/api/login', methods = ['POST'])
 def login():
     body = request.get_json(silent=True)
     if body is None:
@@ -217,7 +217,7 @@ def login():
 
 #ENDPOINT PARA CREAR VEHICULOS
 
-@app.route('/crear_vehiculo', methods = ['POST'])
+@app.route('/api/crear_vehiculo', methods = ['POST'])
 def crear_vehiculo():
     body = request.get_json(silent = True)
     if body is None:
@@ -247,7 +247,7 @@ def crear_vehiculo():
     
 #ENDPOINT PARA TRAER LOS VEHICULOS DE UN USUARIO LOGEADO
 
-@app.route('/mis_vehiculos', methods = ['GET'])
+@app.route('/api/mis_vehiculos', methods = ['GET'])
 @jwt_required()
 def mostrar_vehiculos():
     email_user_current = get_jwt_identity()
@@ -269,7 +269,7 @@ def mostrar_vehiculos():
 
 #ENDPOINT PARA TRAER TODOS LOS VEHICULOS
 
-@app.route('/all_vehicles', methods=['GET'])
+@app.route('/api/all_vehicles', methods=['GET'])
 def get_all_vehicles():
     vehicles = Vehiculos.query.all()
     vehicles_serialized = []
@@ -283,7 +283,7 @@ def get_all_vehicles():
 
 #ENDPOINT PARA BORRAR VEHICULOS 
 
-@app.route('/eliminar_vehiculo/<int:id_vehiculo>', methods=['DELETE'])
+@app.route('/api/eliminar_vehiculo/<int:id_vehiculo>', methods=['DELETE'])
 @jwt_required()
 def eliminar_vehiculo(id_vehiculo):
     email_user_current = get_jwt_identity()
@@ -302,7 +302,7 @@ def eliminar_vehiculo(id_vehiculo):
 
 #ENDPOINT PARA CREAR VEHICULOS DE UN USUARIO ESPECIFICO
 
-@app.route('/crear_mis_vehiculos', methods = ['POST'])
+@app.route('/api/crear_mis_vehiculos', methods = ['POST'])
 @jwt_required()
 def crear_mis_vehiculos():
     email_user_current = get_jwt_identity()
@@ -346,7 +346,7 @@ def crear_mis_vehiculos():
 #  ***********************************************RECUPERAR CONTRASEÑA (SOLO UNA FUNCIÓN)
 
 
-@app.route("/recuperar-password", methods=["POST"])
+@app.route("/api/recuperar-password", methods=["POST"])
 def recuperar_password():
     data = request.get_json()
     email = data.get("email")
@@ -386,7 +386,7 @@ def recuperar_password():
 # *************************************************************VERIFICAR CÓDIGO
 
 
-@app.route("/verificar-codigo", methods=["POST"])
+@app.route("/api/verificar-codigo", methods=["POST"])
 def verificar_codigo():
     data = request.get_json()
     email = data.get("email")
@@ -405,7 +405,7 @@ def verificar_codigo():
 # ******************************************************************CAMBIAR CONTRASEÑA
 
 
-@app.route("/resetPassword", methods=["POST"])
+@app.route("/api/resetPassword", methods=["POST"])
 def cambiar_password():
     data = request.get_json()
     email = data.get("email")
@@ -431,7 +431,7 @@ def cambiar_password():
 
 # Sección de NUEVA ORDEN DE SERVICIO ***************************************************
 
-@app.route("/ordenes", methods=["POST"])
+@app.route("/api/ordenes", methods=["POST"])
 def crear_orden():
     try:
         data = request.get_json()
@@ -473,7 +473,7 @@ def crear_orden():
 # ***************Busca usuario por identificacion
 
 
-@app.route('/usuarios/<int:identificacion>', methods=['GET'])
+@app.route('/api/usuarios/<int:identificacion>', methods=['GET'])
 def get_usuario_por_identificacion(identificacion):
     usuario = User.query.filter_by(identificacion=identificacion).first()
     if not usuario:
@@ -483,7 +483,7 @@ def get_usuario_por_identificacion(identificacion):
 # ****************Lista Vehiculos del Usuario
 
 
-@app.route('/usuarios/<int:user_id>/vehiculos', methods=['GET'])
+@app.route('/api/usuarios/<int:user_id>/vehiculos', methods=['GET'])
 def get_vehiculos_usuario(user_id):
     vehiculos = Vehiculos.query.filter_by(user_id=user_id).all()
     return jsonify([v.serialize() for v in vehiculos]), 200
@@ -491,14 +491,14 @@ def get_vehiculos_usuario(user_id):
 
 # **********************Lista Los Servicios
 
-@app.route('/servicios', methods=['GET'])
+@app.route('/api/servicios', methods=['GET'])
 def get_servicios():
     servicios = Servicio.query.all()
     return jsonify([s.serialize() for s in servicios]), 200
 
 # **********************Lista Los Mecanicos
 
-@app.route('/mecanicos', methods=['GET'])
+@app.route('/api/mecanicos', methods=['GET'])
 def get_mecanicos():
     mecanicos = User.query.filter_by(rol=RolEnum.MECANICO).all()
     return jsonify([m.serialize() for m in mecanicos]), 200
@@ -506,7 +506,7 @@ def get_mecanicos():
 
 #************************************************* PARA ENVIAR LA ORDEN A LA BASE
 
-@app.route('/asociar-servicios', methods=['POST'])
+@app.route('/api/asociar-servicios', methods=['POST'])
 def asociar_servicios_a_orden():
     try:
         data = request.get_json()
@@ -539,7 +539,7 @@ def asociar_servicios_a_orden():
 
 #ENDPOINT PARA OBTENER DATOS EN EL PERFIL DE USUARIO
 
-@app.route('/profile', methods=['GET'])
+@app.route('/api/profile', methods=['GET'])
 @jwt_required()
 def get_user_profile():
     current_user_email = get_jwt_identity()
@@ -557,7 +557,7 @@ def get_user_profile():
 
 #ENDPOINT PARA EDITAR PERFIL DE USUARIO
 
-@app.route('/user/update-profile', methods=['PUT'])
+@app.route('/api/user/update-profile', methods=['PUT'])
 @jwt_required()
 def update_user_profile():
     current_user_email = get_jwt_identity()
