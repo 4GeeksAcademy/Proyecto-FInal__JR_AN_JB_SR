@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 export const InicioMecanico = () => {
 
   const [ordenDeTrabajo, setOrdenDeTrabajo] = useState([])
-  const [fechaTemp, setFechaTemp] = useState()
+  const [fechaTemp, setFechaTemp] = useState({})
 
   const [ordenesFinalizadas, setOrdenesFinalizadas] = useState([]);
 
@@ -154,8 +154,13 @@ export const InicioMecanico = () => {
                       <input
                         type="date"
                         className="form-control"
-                        value={fechaTemp || ""} // Mostrar la fecha temporal correctamente
-                        onChange={(e) => setFechaTemp(e.target.value)}
+                        value={fechaTemp[orden.id_ot] || ""}
+                        onChange={(e) =>
+                          setFechaTemp((prev) => ({
+                            ...prev,
+                            [orden.id_ot]: e.target.value
+                          }))
+                        }
                         disabled={ordenesFinalizadas.includes(orden.id_ot)}
                       />
                     ) : orden.fecha_final.slice(0, 16)}
@@ -174,18 +179,27 @@ export const InicioMecanico = () => {
                       </button>
                       <ul className="dropdown-menu" id={`dropdown-${orden.id_ot}`}>
                         <li><button onClick={() => {
-                          setFechaTemp(null)
-                          updateInfo(orden.id_ot, fechaTemp, "INGRESADO");
+                          setFechaTemp((prev) => ({
+                            ...prev,
+                            [orden.id_ot]: null
+                          }));
+                          updateInfo(orden.id_ot, fechaTemp[orden.id_ot], "INGRESADO");
                         }} className="dropdown-item">Ingresado</button></li>
 
                         <li><button onClick={() => {
-                          setFechaTemp(null)
-                          updateInfo(orden.id_ot, fechaTemp, "EN_PROCESO");
+                          setFechaTemp((prev) => ({
+                            ...prev,
+                            [orden.id_ot]: null
+                          }));
+                          updateInfo(orden.id_ot, fechaTemp[orden.id_ot], "EN_PROCESO");
                         }} className="dropdown-item">En proceso</button></li>
 
                         <li><button onClick={() => {
-                          cerrarDropdown(orden.id_ot);
-                          updateInfo(orden.id_ot, fechaTemp, "FINALIZADO");
+                          setFechaTemp((prev) => ({
+                            ...prev,
+                            [orden.id_ot]: null
+                          }));
+                          updateInfo(orden.id_ot, fechaTemp[orden.id_ot], "FINALIZADO");
                         }} className="dropdown-item">Finalizado</button></li>
                       </ul>
                     </div>
