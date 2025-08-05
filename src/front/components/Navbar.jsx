@@ -5,7 +5,7 @@ import logoB from "../assets/img/logoB.svg";
 
 export const Navbar = () => {
   return (
-    <nav className="navbar navbar-expand-lg navbar-dark shadow-sm mt-2 ms-2 me-2 px-3" style={{ backgroundColor: '#003366', borderRadius: '15px' }}>
+    <nav className="fixed-top navbar navbar-expand-lg navbar-dark shadow-sm ms-2 me-2 px-3" style={{ backgroundColor: '#003366', borderRadius: '15px' }}>
       <div className="container-fluid">
         <img src={logoB} alt="Logo" width={200} />
 
@@ -24,7 +24,7 @@ export const Navbar = () => {
         <div className="collapse navbar-collapse justify-content-end" id="navbarNav">
           <ul className="navbar-nav align-items-center">
             <li className="nav-item">
-              <Link className="nav-link" to="/">Home</Link>
+              <HashLink smooth className="nav-link" to="/#carouselExampleInterval">Home</HashLink>
             </li>
             <li className="nav-item">
               <HashLink smooth className="nav-link" to="/#servicios">Services</HashLink>

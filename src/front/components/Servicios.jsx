@@ -151,29 +151,18 @@ export const Servicios = () => {
                 </section>
             </div >
 
-            <div className="container my-5">
-                <div className="row contacto mb-5">
-                    <div className="col-md-6">
-                        <h4>Contactanos</h4>
+            <div id= "contactenos" className="d-flex container my-5 justify-content-center">
+                <div className="text-center contacto mb-5">
+                    <div>
+                        <h4>Contáctanos</h4>
                         <p><strong>Teléfonos:</strong> +00 100-00018 / +00 100-00019</p>
                         <p><strong>Correo:</strong> <a href="mailto:online@autotek.com">online@autotek.com</a></p>
 
                         <div className="social-icons mt-4">
-                             <img src={IG} alt="IG" width={50} className="me-3"  />
-                             <img src={WA} alt="WA" width={50} className="me-3" />
-                             <img src={FB} alt="FB" width={50} />
+                             <img src={IG} alt="IG" width={70} className="me-3"  />
+                             <img src={WA} alt="WA" width={70} className="me-3" />
+                             <img src={FB} alt="FB" width={70} />
                         </div>
-                    </div>
-
-                    <div id= "contactenos" className="col-md-6">
-                        <form>
-                            <input type="text" className="form-control mb-3" placeholder="Nombre y Apellido" required />
-                            <input type="email" className="form-control mb-3" placeholder="Correo Electrónico" required />
-                            <input type="tel" className="form-control mb-3" placeholder="Teléfono" />
-                            <textarea className="form-control mb-3" rows="4" placeholder="Mensaje / Consulta" required></textarea>
-                            <button type="submit" className="btn"
-                            style={{ backgroundColor: '#003366', color: 'white' }}>Enviar</button>
-                        </form>
                     </div>
                 </div>
             </div>

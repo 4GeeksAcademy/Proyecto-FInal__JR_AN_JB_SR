@@ -69,9 +69,9 @@ export const Vehiculos = () => {
     })
       .then((response) => {
         if (!response.ok) {
-        setMensajeModal("Error al traer la informacion");
-        const modal = new bootstrap.Modal(document.getElementById('modalExito'));
-        modal.show(); // Mostrar el modal en lugar de alert
+          setMensajeModal("Error al traer la informacion");
+          const modal = new bootstrap.Modal(document.getElementById('modalExito'));
+          modal.show(); // Mostrar el modal en lugar de alert
         }
         return response.json()
 
@@ -131,9 +131,6 @@ export const Vehiculos = () => {
         </div>
 
         <div>
-
-          <button onClick={() => { setShowModal(true) }} type="button" class="btn btn-primary btn-lg mt-4"
-            data-bs-whatever="@mdo">Registra un nuevo vehiculo</button>
           <div className={`modal fade ${showModal == true ? "show d-block" : ""} `} id="exampleModal" tabindex="-1"
             aria-labelledby="exampleModalLabel" aria-hidden={!showModal}>
             <div className="modal-dialog">
@@ -195,6 +192,8 @@ export const Vehiculos = () => {
           }
 
         </div>
+        <button onClick={() => { setShowModal(true) }} type="button" class="btn btn-primary btn-lg mt-4"
+            data-bs-whatever="@mdo">Registra un nuevo vehiculo</button>
 
       </div>
 

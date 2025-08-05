@@ -6,7 +6,7 @@ import img3 from "../assets/img/img3.jpg";
 
 export const Carousel = () => {
     return (
-        <div id="carouselExampleInterval" className="carousel slide" data-bs-ride="carousel" style={{
+        <div id="carouselExampleInterval" className="carousel slide pt-5" data-bs-ride="carousel" style={{
             display: 'flex',
             justifyContent: 'center',
             alignItems: 'center',
