@@ -33,7 +33,7 @@ export const Vehiculos = () => {
     console.log("estoy trayendo info de vehiculos")
     const token = localStorage.getItem("jwt_token")
 
-    fetch(import.meta.env.VITE_BACKEND_URL + "/mis_vehiculos", {
+    fetch(import.meta.env.VITE_BACKEND_URL + "mis_vehiculos", {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -61,7 +61,7 @@ export const Vehiculos = () => {
 
   function getAllVehicles() {
     console.log("estoy trayendo info de vehiculos")
-    fetch(import.meta.env.VITE_BACKEND_URL + "/all_vehicles", {
+    fetch(import.meta.env.VITE_BACKEND_URL + "all_vehicles", {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
