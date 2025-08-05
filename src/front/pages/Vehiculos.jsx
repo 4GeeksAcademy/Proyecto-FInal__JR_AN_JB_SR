@@ -21,6 +21,16 @@ export const Vehiculos = () => {
     user_id: ""
   })
 
+  const resetNewCarForm = () => {
+    setInfoNewCar({
+        matricula: "",
+        marca: "",
+        modelo: "",
+        year: "",
+        user_id: ""
+    });
+};
+
   function handleAfterDelete() {
 
     setMensajeModal("¡Vehículo eliminado correctamente!");
@@ -113,6 +123,7 @@ export const Vehiculos = () => {
         modal.show(); // Mostrar el modal en lugar de alert
         getVehicles()
         setShowModal(false)
+        resetNewCarForm();
       })
       .catch((error) => { error })
   }
@@ -137,32 +148,36 @@ export const Vehiculos = () => {
               <div className="modal-content" style={{ backgroundColor: '#214f84' }}>
                 <div className="modal-header">
                   <h1 className="modal-title fs-5 text-light" id="exampleModalLabel">Registro de nuevo vehiculo</h1>
-                  <button onClick={() => { setShowModal(false) }} type="button" className="btn-close" aria-label="Close"></button>
+                  <button onClick={() => { setShowModal(false); resetNewCarForm();}} type="button" className="btn-close" aria-label="Close"></button>
                 </div>
                 <div className="modal-body text-start">
                   <form onSubmit={crearVehiculo}>
                     <div className="mb-3">
                       <label for="matricula" className="col-form-label text-light text-start">Matricula:</label>
                       <input type="text" className="form-control" id="matricula"
-                        onChange={(e) => setInfoNewCar({ ...infoNewCar, matricula: e.target.value })} />
+                        onChange={(e) => setInfoNewCar({ ...infoNewCar, matricula: e.target.value })}
+                        value={infoNewCar.matricula} />
                     </div>
                     <div className="mb-3">
                       <label for="marca" className="col-form-label text-light text-start">Marca:</label>
                       <input type="text" className="form-control" id="marca"
-                        onChange={(e) => setInfoNewCar({ ...infoNewCar, marca: e.target.value })} />
+                        onChange={(e) => setInfoNewCar({ ...infoNewCar, marca: e.target.value })}
+                        value={infoNewCar.marca} />
                     </div>
                     <div className="mb-3">
                       <label for="modelo" className="col-form-label text-light text-start">Modelo:</label>
                       <input type="text" className="form-control" id="modelo"
-                        onChange={(e) => setInfoNewCar({ ...infoNewCar, modelo: e.target.value })} />
+                        onChange={(e) => setInfoNewCar({ ...infoNewCar, modelo: e.target.value })}
+                        value={infoNewCar.modelo} />
                     </div>
                     <div className="mb-3">
                       <label for="year" className="col-form-label text-light text-start">Año:</label>
                       <input type="text" className="form-control" id="year"
-                        onChange={(e) => setInfoNewCar({ ...infoNewCar, year: e.target.value })} />
+                        onChange={(e) => setInfoNewCar({ ...infoNewCar, year: e.target.value })}
+                        value={infoNewCar.year} />
                     </div>
                     <div className="modal-footer">
-                      <button onClick={() => setShowModal(false)} type="button" className="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                      <button onClick={() => { setShowModal(false); resetNewCarForm(); }} type="button" className="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                       <button type="submit" className="btn btn-primary">Registrar</button>
                     </div>
                   </form>
@@ -174,7 +189,7 @@ export const Vehiculos = () => {
           {showModal && (
             <div
               className="modal-backdrop fade show"
-              onClick={() => { setShowModal(false) }} // Cierra al hacer clic en el backdrop
+              onClick={() => { setShowModal(false); resetNewCarForm(); }} // Cierra al hacer clic en el backdrop
             />
           )}
         </div>
@@ -192,7 +207,7 @@ export const Vehiculos = () => {
           }
 
         </div>
-        <button onClick={() => { setShowModal(true) }} type="button" class="btn btn-primary btn-lg mt-4"
+        <button onClick={() => { setShowModal(true); resetNewCarForm();}} type="button" class="btn btn-primary btn-lg mt-4"
             data-bs-whatever="@mdo">Registra un nuevo vehiculo</button>
 
       </div>
@@ -216,9 +231,6 @@ export const Vehiculos = () => {
         </div>
       </div>
     </div>
-
-
-
   )
 
 }; 

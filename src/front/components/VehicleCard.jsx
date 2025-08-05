@@ -2,15 +2,14 @@ import React from 'react'
 import useGlobalReducer from "../hooks/useGlobalReducer.jsx";
 import { Link, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-
+import car_side from "../assets/img/car_side.png";
 
 
 export const VehicleCard = (props) => {
 
-
   const navigate = useNavigate()
-  function eliminarVehiculo(id_vehiculo) {
 
+  function eliminarVehiculo(id_vehiculo) {
     const token = localStorage.getItem("jwt_token")
     fetch(import.meta.env.VITE_BACKEND_URL + `eliminar_vehiculo/${id_vehiculo}`, {
       method: "DELETE",
@@ -37,52 +36,42 @@ export const VehicleCard = (props) => {
         //alert('Hubo un error al intentar eliminar el vehículo')
 
         const alertContainer = document.getElementById("alert-container");
-    alertContainer.innerHTML = `
+        alertContainer.innerHTML = `
     <div class="alert alert-danger" role="alert">
       El vehiculo no pudo ser eliminado porque esta asociado a una orden de trabajo.
     </div>
   `;
-    setTimeout(() => {
-    alertContainer.innerHTML = "";
-    }, 5000);
+        setTimeout(() => {
+          alertContainer.innerHTML = "";
+        }, 5000);
 
 
       })
   }
   return (
-    <div>
-      
-      <div className="card border border-2 border-primary mb-3 rounded-4" style={{ Width: "100%" }}>
-        <div id="alert-container"></div>
-        <div className="row g-0">
-          <div className="col-md-4 d-flex align-items-center justify-content-center">
-            <img src="https://i.pinimg.com/736x/eb/21/8f/eb218ff389898aae7ae7b28894860ec5.jpg" className="p-2 m-2 img-fluid rounded-start" alt="..." />
-          </div>
-          <div className="col-md-6">
-            <div className="card-body">
-              <h3 className="card-title d-flex justify-content-start ms-5 mt-3">Matricula {props.matricula}</h3>
-              <h5 className="card-text d-flex justify-content-start text-body-secondary ms-5 mt-4">Marca: {props.marca}</h5>
-              <h5 className="card-text d-flex justify-content-start text-body-secondary ms-5 mt-2">Modelo: {props.modelo}</h5>
-              <h5 className="card-text d-flex justify-content-start text-body-secondary ms-5 mt-2">Año: {props.year}</h5>
-            </div>
-          </div>
-          <div className="col-md-2 p-4">
+    <div className="card shadow-sm mb-3 rounded-4" style={{ border: '1px solid #e0e0e0' }}>
+      <div id="alert-container" className="position-absolute w-100" style={{ top: '0', left: '0', zIndex: '10' }}></div>
 
-
-            
-            <button onClick={() => {
-              console.log(props.id_vehiculo)
-              eliminarVehiculo(props.id_vehiculo)
-            }} className='btn btn-light my-2 mx-5'><i className="fa-solid fa-trash"></i></button>
-
-
-          </div>
+      <div className="d-flex g-0">
+        <div className="col-2 d-flex align-items-center ps-5">
+          <img src={car_side} alt="Car Icon" style={{ width: '90px', height: 'auto' }} />
+        </div>
+        <div className="col-8 py-4 text-start">
+          <h4 className="card-title mb-1 fw-bold text-dark">{props.marca}</h4>
+          <p className="card-text text-muted mb-0" style={{ fontSize: '0.9rem' }}>{props.matricula}</p>
+          <p className="card-text text-muted mb-0" style={{ fontSize: '0.9rem' }}>{props.modelo}</p>
+          <p className="card-text text-muted" style={{ fontSize: '0.9rem' }}>{props.year}</p>
+        </div>
+        <div className="col-2 pe-5 d-flex justify-content-end align-items-center">
+          <button onClick={() => {
+            console.log(props.id_vehiculo)
+            eliminarVehiculo(props.id_vehiculo)
+          }} className='btn btn border-0'>
+            <i className="fa-solid fa-trash-can" style={{ fontSize: '1.5rem', color: '#dc3545' }}></i>
+          </button>
         </div>
       </div>
-
+      <hr className="my-0" style={{ borderColor: '#e0e0e0' }} />
     </div>
-
-    
-
-  )
+  );
 }
